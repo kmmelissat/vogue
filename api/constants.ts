@@ -1,0 +1,21 @@
+export const API_CONFIG = {
+  baseUrl: process.env.VOGUE_API_BASE_URL ?? "https://mivogue.com:83/APIs",
+  auth: {
+    username: process.env.VOGUE_API_USER ?? "",
+    password: process.env.VOGUE_API_PASSWORD ?? "",
+  },
+  frontendSource: process.env.NEXT_PUBLIC_FRONTEND_SOURCE ?? "",
+  timeout: 600000,
+} as const;
+
+export const API_ENDPOINTS = {
+  reporteVisual: {
+    activos: "/reporte_visual/activos",
+    cobros: "/reporte_visual/cobros",
+    venta: "/reporte_visual/venta",
+    reclutamientos: "/reporte_visual/reclutamientos",
+  },
+} as const;
+
+/** Formato para fecha_inicio y fecha_fin: YYYY-MM-DD (ej: 2026-02-01) */
+export const DATE_FORMAT = "YYYY-MM-DD";
