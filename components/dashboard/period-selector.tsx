@@ -22,7 +22,7 @@ export function PeriodSelector({
         <Button
           key={key}
           variant={period === key ? "default" : "outline"}
-          size="sm"
+          size="lg"
           onClick={() => onPeriodChange(key)}
         >
           {label}
