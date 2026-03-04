@@ -6,7 +6,7 @@ import type { PeriodKey } from "@/hooks/use-date-range";
 type PeriodOption = { key: PeriodKey; label: string };
 
 type PeriodSelectorProps = {
-  period: PeriodKey;
+  period: PeriodKey | null;
   periods: PeriodOption[];
   onPeriodChange: (period: PeriodKey) => void;
 };

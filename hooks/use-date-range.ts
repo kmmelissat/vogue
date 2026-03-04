@@ -3,6 +3,7 @@ import type { DateRange } from "react-day-picker";
 import {
   formatDateApi,
   getDateRangeByPeriod,
+  parseLocalDate,
 } from "@/lib/date-utils";
 import type { FechasParams } from "@/api/types";
 
@@ -20,8 +21,8 @@ const DEFAULT_PERIOD: PeriodKey = "30dias";
 function getInitialDateRange(): DateRange {
   const range = getDateRangeByPeriod(DEFAULT_PERIOD);
   return {
-    from: new Date(range.fecha_inicio),
-    to: new Date(range.fecha_fin),
+    from: parseLocalDate(range.fecha_inicio),
+    to: parseLocalDate(range.fecha_fin),
   };
 }
 
@@ -46,7 +47,7 @@ function dateRangeToFechasParams(range: DateRange | undefined): FechasParams | n
 
 export function useDateRange(onDateChange?: (params: FechasParams) => void) {
   const initial = useMemo(() => getInitialDateRange(), []);
-  const [period, setPeriod] = useState<PeriodKey>(DEFAULT_PERIOD);
+  const [period, setPeriod] = useState<PeriodKey | null>(DEFAULT_PERIOD);
   const [dateRange, setDateRange] = useState<DateRange>(initial);
 
   const notifyDateChange = useCallback(
@@ -62,8 +63,8 @@ export function useDateRange(onDateChange?: (params: FechasParams) => void) {
       setPeriod(p);
       const range = getDateRangeByPeriod(p);
       const newRange: DateRange = {
-        from: new Date(range.fecha_inicio),
-        to: new Date(range.fecha_fin),
+        from: parseLocalDate(range.fecha_inicio),
+        to: parseLocalDate(range.fecha_fin),
       };
       setDateRange(newRange);
       onDateChange?.(range);
@@ -75,6 +76,7 @@ export function useDateRange(onDateChange?: (params: FechasParams) => void) {
     (range: DateRange | undefined) => {
       setDateRange(range?.from ? range : initial);
       if (range?.from && range?.to) {
+        setPeriod(null); // Rango manual → no preset seleccionado
         notifyDateChange(range);
       }
     },
@@ -86,7 +88,7 @@ export function useDateRange(onDateChange?: (params: FechasParams) => void) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Solo al montar
   }, []);
 
-  const periodLabel = getPeriodLabel(dateRange);
+  const periodLabel = period === null ? "Personalizado" : getPeriodLabel(dateRange);
 
   return {
     period,

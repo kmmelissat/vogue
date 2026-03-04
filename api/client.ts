@@ -4,12 +4,11 @@ import type { ApiError, ApiResult } from "./types";
 
 function normalizeError(error: unknown): ApiError {
   if (error && typeof error === "object" && "isAxiosError" in error) {
-    const axiosError = error as AxiosError<{ message?: string }>;
+    const axiosError = error as AxiosError<{ message?: string; detalle?: string }>;
+    const data = axiosError.response?.data;
+    const msg = data?.detalle ?? data?.message;
     return {
-      message:
-        axiosError.response?.data?.message ??
-        axiosError.message ??
-        "Error de conexión",
+      message: msg ?? axiosError.message ?? "Error de conexión",
       statusCode: axiosError.response?.status,
       code: axiosError.code,
       originalError: error,
@@ -38,7 +37,13 @@ export async function apiGet<T>(url: string, params?: Record<string, string>): P
   } catch (error) {
     const apiError = normalizeError(error);
     if (process.env.NODE_ENV === "development") {
-      console.error(`[API Error] ${url}:`, apiError);
+      const err = error as { response?: { status?: number; data?: unknown } };
+      console.error(
+        `[API Error] ${url}:`,
+        apiError.message,
+        apiError.statusCode ?? err.response?.status,
+        err.response?.data
+      );
     }
     return { success: false, error: apiError };
   }
@@ -62,7 +67,13 @@ export async function apiPostFormData<T>(
   } catch (error) {
     const apiError = normalizeError(error);
     if (process.env.NODE_ENV === "development") {
-      console.error(`[API Error] ${url}:`, apiError);
+      const err = error as { response?: { status?: number; data?: unknown } };
+      console.error(
+        `[API Error] ${url}:`,
+        apiError.message,
+        apiError.statusCode ?? err.response?.status,
+        err.response?.data
+      );
     }
     return { success: false, error: apiError };
   }

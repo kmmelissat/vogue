@@ -19,10 +19,19 @@ export function formatDateRangeDisplay(from?: Date, to?: Date): string {
 }
 
 /**
- * Formatea una fecha para la API (YYYY-MM-DD)
+ * Formatea una fecha para la API (YYYY-MM-DD) usando fecha local (evita desfase por timezone)
  */
 export function formatDateApi(date: Date): string {
-  return date.toISOString().split("T")[0] ?? "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Parsea YYYY-MM-DD como fecha local (evita desfase por timezone) */
+export function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
 }
 
 /**
@@ -48,12 +57,14 @@ export function getDateRangeByPeriod(period: "hoy" | "7dias" | "30dias" | "mesAc
       start.setDate(start.getDate() - 6);
       break;
     case "30dias":
+      /* 30 días inclusivos con hoy como último día (ej: 2 feb – 3 mar) */
       start = new Date(today);
       start.setDate(start.getDate() - 29);
       break;
     case "mesActual":
       start = new Date(today.getFullYear(), today.getMonth(), 1);
-      end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      /* Fin = hoy (no permitir fechas futuras) */
+      end = new Date(today);
       break;
     default:
       start = new Date(today);

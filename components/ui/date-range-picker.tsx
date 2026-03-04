@@ -27,20 +27,33 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
   const [month, setMonth] = React.useState<Date | undefined>(dateRange?.from);
+  const [pendingRange, setPendingRange] = React.useState<DateRange | undefined>(
+    dateRange
+  );
 
   React.useEffect(() => {
-    if (open && dateRange?.from) setMonth(dateRange.from);
-  }, [open, dateRange?.from]);
+    if (open) {
+      setPendingRange(dateRange);
+      if (dateRange?.from) setMonth(dateRange.from);
+    }
+  }, [open, dateRange]);
 
-  const handleSelect = React.useCallback(
-    (range: DateRange | undefined) => {
-      if (typeof onDateRangeChange === "function") {
-        onDateRangeChange(range);
-      }
-      if (range?.from && range?.to) setOpen(false);
-    },
-    [onDateRangeChange],
-  );
+  const handleSelect = React.useCallback((range: DateRange | undefined) => {
+    setPendingRange(range?.from ? range : undefined);
+  }, []);
+
+  const handleApply = React.useCallback(() => {
+    if (pendingRange?.from) {
+      const range: DateRange = {
+        from: pendingRange.from,
+        to: pendingRange.to ?? pendingRange.from,
+      };
+      onDateRangeChange(range);
+      setOpen(false);
+    }
+  }, [pendingRange, onDateRangeChange]);
+
+  const hasCompleteRange = Boolean(pendingRange?.from);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,7 +70,7 @@ export function DateRangePicker({
       <PopoverContent className="w-auto bg-white p-0" align="start">
         <Calendar
           mode="range"
-          selected={dateRange}
+          selected={pendingRange}
           onSelect={handleSelect}
           disabled={{ after: disabledAfter }}
           numberOfMonths={numberOfMonths}
@@ -65,6 +78,15 @@ export function DateRangePicker({
           onMonthChange={setMonth}
           defaultMonth={dateRange?.from}
         />
+        <div className="border-t p-2 flex justify-end">
+          <Button
+            size="sm"
+            onClick={handleApply}
+            disabled={!hasCompleteRange}
+          >
+            Aplicar
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );

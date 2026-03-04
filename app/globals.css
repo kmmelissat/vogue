@@ -16,6 +16,16 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
+  --color-palette-0: var(--palette-0);
+  --color-palette-1: var(--palette-1);
+  --color-palette-2: var(--palette-2);
+  --color-palette-3: var(--palette-3);
+  --color-palette-4: var(--palette-4);
+  --color-palette-5: var(--palette-5);
+  --color-palette-6: var(--palette-6);
+  --color-palette-7: var(--palette-7);
+  --color-palette-8: var(--palette-8);
+  --color-palette-9: var(--palette-9);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
@@ -47,38 +57,56 @@
 
 :root {
   --radius: 0.625rem;
-  /* Vogue - UI tranquila: colores principales solo para texto, bordes, botones clave */
-  --background: #ffffff;
-  --foreground: #9e1b2f; /* Rojo vino - textos */
-  --card: #ffffff;
-  --card-foreground: #9e1b2f;
-  --popover: #ffffff;
-  --popover-foreground: #9e1b2f;
-  --primary: #7e1425; /* Borgoña - botones seleccionados/acciones */
-  --primary-foreground: #ffffff;
-  --secondary: #f8f6f7; /* Gris muy suave con tinte rosa */
-  --secondary-foreground: #9e1b2f;
-  --muted: #f8f6f7;
-  --muted-foreground: #8b6b70; /* Rojo apagado para secundario */
-  --accent: #f8f6f7; /* Hover suave - casi blanco */
-  --accent-foreground: #9e1b2f;
-  --destructive: #7e1425;
-  --border: rgba(158, 27, 47, 0.12);
-  --input: rgba(158, 27, 47, 0.08);
-  --ring: rgba(158, 27, 47, 0.25);
-  --chart-1: #9e1b2f;
-  --chart-2: #7e1425;
-  --chart-3: #dfa6ae;
-  --chart-4: #e8bfc6;
-  --chart-5: #7e1425;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #9e1b2f;
-  --sidebar-primary: #7e1425;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f8f6f7;
-  --sidebar-accent-foreground: #9e1b2f;
-  --sidebar-border: rgba(158, 27, 47, 0.1);
-  --sidebar-ring: rgba(158, 27, 47, 0.25);
+
+  /* Paleta única - toda la app deriva de aquí */
+  --palette-0: #7e1425; 
+  --palette-1: #c41e3a;
+  --palette-2: #e63946;
+  --palette-3: #9e1b2f; 
+  --palette-4: #2a9d8f;
+  --palette-5: #e9c46a;
+  --palette-6: #264653;
+  --palette-7: #f4a261;
+  --palette-8: #6a4c93;
+  --palette-9: #d62839;
+  --palette-neutral: #ffffff;
+  --palette-muted: #f8f6f7;
+  --palette-muted-fg: #8b6b70;
+
+  /* Semanticas */
+  --background: var(--palette-neutral);
+  --foreground: var(--palette-3);
+  --card: var(--palette-neutral);
+  --card-foreground: var(--palette-3);
+  --popover: var(--palette-neutral);
+  --popover-foreground: var(--palette-3);
+  --primary: var(--palette-0);
+  --primary-foreground: var(--palette-neutral);
+  --secondary: var(--palette-muted);
+  --secondary-foreground: var(--palette-3);
+  --muted: var(--palette-muted);
+  --muted-foreground: var(--palette-muted-fg);
+  --accent: var(--palette-muted);
+  --accent-foreground: var(--palette-3);
+  --destructive: var(--palette-0);
+  --border: color-mix(in srgb, var(--palette-3) 12%, transparent);
+  --input: color-mix(in srgb, var(--palette-3) 8%, transparent);
+  --ring: color-mix(in srgb, var(--palette-3) 25%, transparent);
+  --chart-1: var(--palette-1);
+  --chart-2: var(--palette-2);
+  --chart-3: var(--palette-3);
+  --chart-4: var(--palette-4);
+  --chart-5: var(--palette-5);
+
+  /* Sidebar → paleta */
+  --sidebar: var(--palette-neutral);
+  --sidebar-foreground: var(--palette-3);
+  --sidebar-primary: var(--palette-0);
+  --sidebar-primary-foreground: var(--palette-neutral);
+  --sidebar-accent: var(--palette-muted);
+  --sidebar-accent-foreground: var(--palette-3);
+  --sidebar-border: color-mix(in srgb, var(--palette-3) 10%, transparent);
+  --sidebar-ring: color-mix(in srgb, var(--palette-3) 25%, transparent);
 }
 
 @layer base {

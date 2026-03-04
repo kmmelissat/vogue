@@ -7,9 +7,54 @@ import type {
   CobrosDetalle,
   VentaDetalle,
 } from "./types";
+import type { ApiResult } from "./types";
 import { validateFechasParams } from "./types";
 
-function createReporteFetcher<T>(endpoint: string) {
+/** Usa el proxy de Next.js en el navegador para evitar CORS y exponer credenciales */
+async function fetchViaProxy<T>(
+  endpoint: string,
+  params: FechasParams
+): Promise<ApiResult<ReporteVisualResponse<T>>> {
+  const formData = new FormData();
+  formData.append("fecha_inicio", params.fecha_inicio);
+  formData.append("fecha_fin", params.fecha_fin);
+
+  const res = await fetch(`/api/reporte-visual/${endpoint}`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      success: false,
+      error: {
+        message: data.detalle ?? data.message ?? "Error de conexión",
+        statusCode: res.status,
+      },
+    };
+  }
+  // La API puede devolver 200 con success: false (ej: credenciales incorrectas)
+  if (data.success === false) {
+    return {
+      success: false,
+      error: {
+        message:
+          typeof data.detalle === "string"
+            ? data.detalle
+            : "Error en la respuesta de la API",
+      },
+    };
+  }
+  return { success: true, data };
+}
+
+function getEndpointName(path: string): string {
+  return path.replace(/^\/reporte_visual\//, "") || path;
+}
+
+function createReporteFetcher<T>(endpointPath: string) {
+  const endpointName = getEndpointName(endpointPath);
   return async (params: FechasParams) => {
     const validation = validateFechasParams(params);
     if (!validation.valid) {
@@ -21,7 +66,11 @@ function createReporteFetcher<T>(endpoint: string) {
         },
       };
     }
-    return apiPostFormData<ReporteVisualResponse<T>>(endpoint, params);
+    // En el navegador usar proxy; en Node (scripts) usar API directa
+    if (typeof window !== "undefined") {
+      return fetchViaProxy<T>(endpointName, params);
+    }
+    return apiPostFormData<ReporteVisualResponse<T>>(endpointPath, params);
   };
 }
 
