@@ -6,15 +6,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const PALETTE = [
+  "var(--palette-secondary-blue)",
+  "var(--palette-secondary-green)",
   "var(--palette-1)",
+  "var(--palette-secondary-orange)",
   "var(--palette-2)",
-  "var(--palette-3)",
-  "var(--palette-4)",
-  "var(--palette-5)",
-  "var(--palette-6)",
-  "var(--palette-7)",
-  "var(--palette-8)",
-  "var(--palette-9)",
+  "var(--palette-secondary-blue)",
+  "var(--palette-secondary-green)",
+  "var(--palette-1)",
+  "var(--palette-secondary-orange)",
 ] as const;
 
 type KpiCardProps = {

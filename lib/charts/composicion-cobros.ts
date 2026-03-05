@@ -37,7 +37,7 @@ export function getComposicionCobrosData(kpis: ReporteKpis): ComposicionCobrosDa
   }
 
   const pieData: ComposicionCobrosPieItem[] = [
-    { name: "Cobro neto", value: displayCobroNeto, fill: "var(--palette-6)" },
+    { name: "Cobro neto", value: displayCobroNeto, fill: "var(--chart-1)" },
     {
       name: "Anulaciones",
       value: displayAnulaciones,

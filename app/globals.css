@@ -26,6 +26,9 @@
   --color-palette-7: var(--palette-7);
   --color-palette-8: var(--palette-8);
   --color-palette-9: var(--palette-9);
+  --color-secondary-blue: var(--palette-secondary-blue);
+  --color-secondary-green: var(--palette-secondary-green);
+  --color-secondary-orange: var(--palette-secondary-orange);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
@@ -58,55 +61,61 @@
 :root {
   --radius: 0.625rem;
 
-  /* Paleta única - toda la app deriva de aquí */
-  --palette-0: #7e1425; 
-  --palette-1: #c41e3a;
-  --palette-2: #e63946;
-  --palette-3: #9e1b2f; 
-  --palette-4: #2a9d8f;
-  --palette-5: #e9c46a;
-  --palette-6: #264653;
-  --palette-7: #f4a261;
-  --palette-8: #6a4c93;
-  --palette-9: #d62839;
+  /* Paleta oficial Vogue */
+  --palette-0: #9C182F; /* rojo vino - principal */
+  --palette-1: #C25575; /* mauve */
+  --palette-2: #EA5978; /* rosa vibrante */
+  --palette-3: #F08DA6; /* rosa suave */
+  --palette-4: #DA9189; /* rosa beige */
+  --palette-5: #E3B9B3; /* beige claro */
+  --palette-6: #CB998D; /* taupe */
+  --palette-7: #FFA489; /* durazno */
+  --palette-8: #9C182F; /* acento (igual que 0) */
+  --palette-9: #C25575; /* acento (igual que 1) */
   --palette-neutral: #ffffff;
-  --palette-muted: #f8f6f7;
-  --palette-muted-fg: #8b6b70;
+  --palette-muted: #faf5f4;
+  --palette-muted-fg: #6b5b58;
+
+  /* Secundarios (oficial - por línea) */
+  --palette-secondary-blue: #AECDF4;   /* azul cielo - Higiene, Capilar, Skin, Bienestar, Perfumería */
+  --palette-secondary-green: #B3DFA4; /* verde pastel - Capilar, Bienestar */
+  --palette-secondary-orange: #FFC2A5; /* naranja pastel - Higiene, Capilar, Skin Care */
 
   /* Semanticas */
   --background: var(--palette-neutral);
-  --foreground: var(--palette-3);
+  --foreground: #2a2526;
   --card: var(--palette-neutral);
-  --card-foreground: var(--palette-3);
+  --card-foreground: var(--foreground);
   --popover: var(--palette-neutral);
-  --popover-foreground: var(--palette-3);
+  --popover-foreground: var(--foreground);
   --primary: var(--palette-0);
   --primary-foreground: var(--palette-neutral);
   --secondary: var(--palette-muted);
-  --secondary-foreground: var(--palette-3);
+  --secondary-foreground: var(--foreground);
   --muted: var(--palette-muted);
   --muted-foreground: var(--palette-muted-fg);
-  --accent: var(--palette-muted);
-  --accent-foreground: var(--palette-3);
+  --accent: var(--palette-5);
+  --accent-foreground: var(--foreground);
   --destructive: var(--palette-0);
-  --border: color-mix(in srgb, var(--palette-3) 12%, transparent);
-  --input: color-mix(in srgb, var(--palette-3) 8%, transparent);
-  --ring: color-mix(in srgb, var(--palette-3) 25%, transparent);
-  --chart-1: var(--palette-1);
-  --chart-2: var(--palette-2);
-  --chart-3: var(--palette-3);
-  --chart-4: var(--palette-4);
-  --chart-5: var(--palette-5);
+  --border: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --input: color-mix(in srgb, var(--foreground) 8%, transparent);
+  --ring: color-mix(in srgb, var(--palette-0) 35%, transparent);
+  /* Gráficos: celestes, verdes, morados, naranjas */
+  --chart-1: var(--palette-secondary-blue);
+  --chart-2: var(--palette-secondary-green);
+  --chart-3: var(--palette-1);
+  --chart-4: var(--palette-secondary-orange);
+  --chart-5: var(--palette-2);
 
   /* Sidebar → paleta */
   --sidebar: var(--palette-neutral);
-  --sidebar-foreground: var(--palette-3);
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--palette-0);
   --sidebar-primary-foreground: var(--palette-neutral);
   --sidebar-accent: var(--palette-muted);
-  --sidebar-accent-foreground: var(--palette-3);
-  --sidebar-border: color-mix(in srgb, var(--palette-3) 10%, transparent);
-  --sidebar-ring: color-mix(in srgb, var(--palette-3) 25%, transparent);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --sidebar-ring: color-mix(in srgb, var(--palette-0) 25%, transparent);
 }
 
 @layer base {

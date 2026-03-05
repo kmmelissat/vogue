@@ -23,7 +23,7 @@ import { XCircle } from "lucide-react";
 const chartConfig = {
   cobroNeto: {
     label: "Cobro neto",
-    color: "var(--palette-6)",
+    color: "var(--chart-1)",
   },
   anulaciones: {
     label: "Anulaciones",
@@ -143,7 +143,7 @@ export function ComposicionCobrosChart({ kpis }: ComposicionCobrosChartProps) {
             <div className="flex items-center gap-1.5">
               <div
                 className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                style={{ backgroundColor: "var(--palette-6)" }}
+                style={{ backgroundColor: "var(--chart-1)" }}
               />
               <span className="text-muted-foreground">Cobro neto:</span>
               <span className="font-mono font-medium">

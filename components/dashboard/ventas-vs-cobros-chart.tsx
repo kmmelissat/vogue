@@ -109,7 +109,7 @@ export function VentasVsCobrosChart({ kpis }: VentasVsCobrosChartProps) {
               {chartData.map((_, i) => (
                 <Cell
                   key={i}
-                  fill={i === 0 ? "var(--chart-1)" : "var(--palette-6)"}
+                  fill={i === 0 ? "var(--chart-1)" : "var(--chart-2)"}
                 />
               ))}
             </Bar>
@@ -130,7 +130,7 @@ export function VentasVsCobrosChart({ kpis }: VentasVsCobrosChartProps) {
           <div className="flex items-center gap-1.5">
             <div
               className="h-2.5 w-2.5 shrink-0 rounded-sm"
-              style={{ backgroundColor: "var(--palette-6)" }}
+              style={{ backgroundColor: "var(--chart-2)" }}
             />
             <span className="text-muted-foreground">Cobro neto:</span>
             <span className="font-mono font-medium">
