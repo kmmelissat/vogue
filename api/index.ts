@@ -1,6 +1,4 @@
 export { vogueApi } from "./axios";
-export { getInstance } from "./instance";
-export { apiGet } from "./client";
 export {
   getActivos,
   getCobros,

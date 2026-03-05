@@ -27,29 +27,6 @@ function normalizeError(error: unknown): ApiError {
 }
 
 /**
- * Ejecuta una petición GET y retorna un ApiResult tipado.
- * Centraliza el manejo de errores y la estructura de respuesta.
- */
-export async function apiGet<T>(url: string, params?: Record<string, string>): Promise<ApiResult<T>> {
-  try {
-    const response = await vogueApi.get<T>(url, { params });
-    return { success: true, data: response.data };
-  } catch (error) {
-    const apiError = normalizeError(error);
-    if (process.env.NODE_ENV === "development") {
-      const err = error as { response?: { status?: number; data?: unknown } };
-      console.error(
-        `[API Error] ${url}:`,
-        apiError.message,
-        apiError.statusCode ?? err.response?.status,
-        err.response?.data
-      );
-    }
-    return { success: false, error: apiError };
-  }
-}
-
-/**
  * Ejecuta una petición POST con multipart/form-data (fecha_inicio, fecha_fin).
  * Usado por los endpoints de reporte_visual.
  */
