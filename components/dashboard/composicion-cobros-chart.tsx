@@ -131,6 +131,13 @@ export function ComposicionCobrosChart({ kpis }: ComposicionCobrosChartProps) {
           </ChartContainer>
         </div>
 
+        <div className="flex flex-col items-center py-2 text-center">
+          <div className="text-xs text-muted-foreground">Cobro bruto</div>
+          <div className="text-2xl font-bold tabular-nums">
+            {formatMoney(kpis.cobroBruto)}
+          </div>
+        </div>
+
         <div className="rounded-lg border border-border/60 bg-muted/40 p-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-1.5">
