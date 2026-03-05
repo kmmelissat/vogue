@@ -109,6 +109,30 @@ NEXT_PUBLIC_FRONTEND_SOURCE=vogue-web
 - Selector de rango de fechas (Date Range Picker)
 - Presets: Hoy, 7 días, 30 días, Este mes, Mes anterior
 
+## Iframe en dashboard PHP de Vogue
+
+El proyecto permite ser embebido en un iframe desde el dashboard PHP de Vogue. Por defecto se aceptan `mivogue.com` y `www.mivogue.com`.
+
+**En el PHP del dashboard:**
+
+```html
+<iframe
+  src="https://vogue-three.vercel.app"
+  width="100%"
+  height="800"
+  frameborder="0"
+  style="border: none;"
+></iframe>
+```
+
+**URL de producción:** [https://vogue-three.vercel.app](https://vogue-three.vercel.app)
+
+**Dominios permitidos:** configura `IFRAME_ALLOWED_ORIGINS` en Vercel con los orígenes separados por espacio, por ejemplo:
+
+```
+IFRAME_ALLOWED_ORIGINS=https://mivogue.com https://www.mivogue.com https://dashboard.mivogue.com
+```
+
 ## API
 
 La app usa un proxy en `/api/reporte-visual/[endpoint]` para evitar CORS y no exponer credenciales en el cliente. Los endpoints consumidos son:
