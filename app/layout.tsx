@@ -10,7 +10,11 @@ const lato = Lato({
 
 export const metadata: Metadata = {
   title: "Vogue",
-  description: "Vogue app",
+  description: "Vogue | Dashboard ",
+  icons: {
+    icon: "/vogue_logo.svg",
+    apple: "/vogue_logo.svg",
+  },
 };
 
 export default function RootLayout({
