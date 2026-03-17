@@ -9,6 +9,8 @@ import { VentasVsCobrosChart } from "./charts/ventas-vs-cobros-chart";
 import { DesgloseVentasWaterfall } from "./charts/desglose-ventas-waterfall";
 import { ComposicionCobrosChart } from "./charts/composicion-cobros-chart";
 import { ReclutamientosCard } from "./charts/reclutamientos-card";
+import { ReportePorZonaCard } from "./charts/reporte-por-zona-card";
+import { ReportePorImpulsadoraCard } from "./charts/reporte-por-impulsadora-card";
 import { ExportExcelButton } from "./export-excel-button";
 import { PersonalizablePage } from "./personalizable/personalizable-page";
 import { useReporteData } from "@/hooks/use-reporte-data";
