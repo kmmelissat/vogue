@@ -9,6 +9,9 @@ import { PeriodSelector } from "./period-selector";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, RefreshCw } from "lucide-react";
 import type { FechasParams } from "@/api/types";
+import { cn } from "@/lib/utils";
+
+export type VistaActiva = "principal" | "personalizable";
 
 function useRelativeTime(date: Date | null): string {
   const [label, setLabel] = React.useState("");
@@ -36,9 +39,17 @@ export type DashboardHeaderProps = {
   onDateChange?: (params: FechasParams) => void;
   onRefresh?: () => void;
   lastUpdated?: Date | null;
+  vistaActiva: VistaActiva;
+  onVistaChange: (vista: VistaActiva) => void;
 };
 
-export function DashboardHeader({ onDateChange, onRefresh, lastUpdated }: DashboardHeaderProps) {
+export function DashboardHeader({
+  onDateChange,
+  onRefresh,
+  lastUpdated,
+  vistaActiva,
+  onVistaChange,
+}: DashboardHeaderProps) {
   const {
     period,
     dateRange,
@@ -76,6 +87,34 @@ export function DashboardHeader({ onDateChange, onRefresh, lastUpdated }: Dashbo
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
+        {/* Selector de vista */}
+        <div className="flex items-center rounded-lg border border-border bg-muted/50 p-0.5">
+          <button
+            type="button"
+            onClick={() => onVistaChange("principal")}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+              vistaActiva === "principal"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Dashboard Principal
+          </button>
+          <button
+            type="button"
+            onClick={() => onVistaChange("personalizable")}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+              vistaActiva === "personalizable"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Dashboard Personalizable
+          </button>
+        </div>
+
         <PeriodSelector
           period={period}
           periods={periods}
@@ -89,7 +128,7 @@ export function DashboardHeader({ onDateChange, onRefresh, lastUpdated }: Dashbo
           />
         </div>
         <div className="flex items-center gap-1 border-l border-border pl-2">
-          {onRefresh && (
+          {onRefresh && vistaActiva === "principal" && (
             <Button
               variant="ghost"
               size="icon"
