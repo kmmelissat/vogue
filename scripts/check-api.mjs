@@ -25,8 +25,12 @@ const ENDPOINTS = [
   { name: "venta", path: "/reporte_visual/venta" },
   { name: "venta/detalle_1 (reporte por zona)", path: "/reporte_visual/venta/detalle_1" },
   { name: "venta/detalle_2 (reporte por impulsadora)", path: "/reporte_visual/venta/detalle_2" },
-  { name: "venta/detalle_3", path: "/reporte_visual/venta/detalle_3" },
-  { name: "venta/detalle_4", path: "/reporte_visual/venta/detalle_4" },
+  { name: "venta/detalle_3 (reporte por línea)", path: "/reporte_visual/venta/detalle_3" },
+  { name: "venta/detalle_4 (reporte por tipo crédito)", path: "/reporte_visual/venta/detalle_4" },
+  { name: "cobros/detalle_1 (reporte por medio)", path: "/reporte_visual/cobros/detalle_1" },
+  { name: "cobros/detalle_2 (reporte por tipo documento)", path: "/reporte_visual/cobros/detalle_2" },
+  { name: "cobros/detalle_3 (reporte por municipio)", path: "/reporte_visual/cobros/detalle_3" },
+  { name: "cobros/detalle_4 (reporte por zona)", path: "/reporte_visual/cobros/detalle_4" },
   { name: "reclutamientos", path: "/reporte_visual/reclutamientos" },
 ];
 

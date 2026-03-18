@@ -17,13 +17,15 @@ async function fetchViaProxy<T>(
   params: FechasParams,
   signal?: AbortSignal
 ): Promise<ApiResult<ReporteVisualResponse<T>>> {
-  const formData = new FormData();
-  formData.append("fecha_inicio", params.fecha_inicio);
-  formData.append("fecha_fin", params.fecha_fin);
-
   const res = await fetch(`/api/reporte-visual/${endpoint}`, {
     method: "POST",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fecha_inicio: params.fecha_inicio,
+      fecha_fin: params.fecha_fin,
+    }),
     signal,
   });
   const data = await res.json();
@@ -137,4 +139,40 @@ export const getVentaDetalle3 =
 export const getVentaDetalle4 =
   createReporteFetcher<ReportePorZonaDetalle>(
     API_ENDPOINTS.reporteVisual.ventaDetalle4
+  );
+
+/**
+ * Obtiene el reporte de cobros por medio (cobros/detalle_1) para el rango de fechas indicado.
+ * Incluye titulo_reporte y datos con Etiqueta (medio) y Valor (monto).
+ */
+export const getCobrosDetalle1 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.cobrosDetalle1
+  );
+
+/**
+ * Obtiene el reporte de cobros por tipo documento (cobros/detalle_2) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getCobrosDetalle2 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.cobrosDetalle2
+  );
+
+/**
+ * Obtiene el reporte de cobros por municipio (cobros/detalle_3) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getCobrosDetalle3 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.cobrosDetalle3
+  );
+
+/**
+ * Obtiene el reporte de cobros por zona (cobros/detalle_4) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getCobrosDetalle4 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.cobrosDetalle4
   );

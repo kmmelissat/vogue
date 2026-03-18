@@ -8,6 +8,10 @@ const VALID_SUB_ENDPOINTS: [string, string][] = [
   ["venta", "detalle_2"],
   ["venta", "detalle_3"],
   ["venta", "detalle_4"],
+  ["cobros", "detalle_1"],
+  ["cobros", "detalle_2"],
+  ["cobros", "detalle_3"],
+  ["cobros", "detalle_4"],
 ];
 
 export async function POST(

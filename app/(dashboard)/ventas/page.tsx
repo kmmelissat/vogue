@@ -3,7 +3,7 @@ import { VentasContent } from "@/components/dashboard/ventas-content";
 
 export default async function VentasPage() {
   const initialFechas = getDefaultFechas();
-  const { reportePorZona, reportePorImpulsadora, reporteDetalle3, reportePorTipoCredito, error } =
+  const { reportePorZona, reportePorImpulsadora, reporteDetalle3, reportePorTipoCredito, ventaData, error } =
     await fetchVentaDetallesServer(initialFechas);
 
   return (
@@ -12,6 +12,7 @@ export default async function VentasPage() {
       initialReportePorImpulsadora={reportePorImpulsadora}
       initialReporteDetalle3={reporteDetalle3}
       initialReportePorTipoCredito={reportePorTipoCredito}
+      initialVentaData={ventaData}
       initialFechas={initialFechas}
       initialError={error}
     />

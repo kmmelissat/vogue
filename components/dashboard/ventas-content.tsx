@@ -48,6 +48,7 @@ type VentasContentProps = {
   initialReportePorImpulsadora: ReportePorZonaDetalle | null;
   initialReporteDetalle3: ReportePorZonaDetalle | null;
   initialReportePorTipoCredito: ReportePorZonaDetalle | null;
+  initialVentaData: any | null;
   initialFechas: FechasParams;
   initialError: string | null;
 };
@@ -57,6 +58,7 @@ export function VentasContent({
   initialReportePorImpulsadora,
   initialReporteDetalle3,
   initialReportePorTipoCredito,
+  initialVentaData,
   initialFechas,
   initialError,
 }: VentasContentProps) {
@@ -76,6 +78,7 @@ export function VentasContent({
     reportePorImpulsadora,
     reporteDetalle3,
     reportePorTipoCredito,
+    initialVentaData,
   });
 
   const displayError = error ?? initialError;

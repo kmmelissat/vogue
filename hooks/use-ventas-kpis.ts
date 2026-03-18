@@ -28,6 +28,7 @@ export type VentasKpis = {
 
 type UseVentasKpisOptions = {
   initialData?: VentasKpis | null;
+  initialVentaData?: any | null;
   reportePorZona?: ReportePorZonaDetalle | null;
   reportePorImpulsadora?: ReportePorZonaDetalle | null;
   reporteDetalle3?: ReportePorZonaDetalle | null;
@@ -52,13 +53,18 @@ async function fetchVentasKpis(
     reportePorImpulsadora?: ReportePorZonaDetalle | null;
     reporteDetalle3?: ReportePorZonaDetalle | null;
     reportePorTipoCredito?: ReportePorZonaDetalle | null;
-  }
+  },
+  initialVentaData?: any | null
 ): Promise<VentasKpis> {
-  const ventaRes = await getVenta(params, signal);
-
-  if (!ventaRes.success) throw new Error(ventaRes.error.message);
-
-  const v = "data" in ventaRes ? ventaRes.data.detalle : null;
+  let v = initialVentaData;
+  
+  // Si no hay datos iniciales, hacer fetch
+  if (!v) {
+    const ventaRes = await getVenta(params, signal);
+    if (!ventaRes.success) throw new Error(ventaRes.error.message);
+    v = "data" in ventaRes ? ventaRes.data.detalle : null;
+  }
+  
   if (!v) throw new Error("Datos de venta incompletos");
 
   const devoluciones = v.venta_bruta - v.venta_neta;
@@ -93,6 +99,7 @@ export function useVentasKpis(
 ) {
   const { 
     initialData,
+    initialVentaData,
     reportePorZona,
     reportePorImpulsadora,
     reporteDetalle3,
@@ -108,7 +115,7 @@ export function useVentasKpis(
         reportePorImpulsadora,
         reporteDetalle3,
         reportePorTipoCredito,
-      });
+      }, initialVentaData);
     },
     enabled: !!fechas,
     initialData: initialData ?? undefined,
