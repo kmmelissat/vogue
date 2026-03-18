@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import { useCobrosDetalles } from "@/hooks/use-cobros-detalles";
+import { useCobrosKpis } from "@/hooks/use-cobros-kpis";
 import type { ReportePorZonaDetalle, FechasParams } from "@/api/types";
 import { DashboardHeader } from "./dashboard-header";
 import { ReportePorMedioCard } from "./charts/reporte-por-medio-card";
 import { ReportePorTipoDocumentoCard } from "./charts/reporte-por-tipo-documento-card";
 import { ReportePorMunicipioCard } from "./charts/reporte-por-municipio-card";
 import { ReporteCobrosZonaCard } from "./charts/reporte-cobros-por-zona-card";
+import { CobrosKpiCards } from "./kpis/cobros-kpi-cards";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,6 +73,14 @@ export function CobrosContent({
       initialReportePorZona,
     });
 
+  const { kpis: cobrosKpis, state: kpisState } = useCobrosKpis(fechas, {
+    reportePorMedio,
+    reportePorTipoDocumento,
+    reportePorMunicipio,
+    reportePorZona,
+    initialCobrosData,
+  });
+
   const displayError = error ?? initialError;
 
   return (
@@ -78,12 +88,56 @@ export function CobrosContent({
       <DashboardHeader onDateChange={setFechas} onRefresh={() => retry()} />
       <div className="flex-1 p-6 space-y-6">
         {(state === "idle" || state === "loading") && (
-          <div className="grid items-stretch gap-5 lg:grid-cols-2">
-            <ReporteBarrasCardSkeleton />
-            <ReporteBarrasCardSkeleton />
-            <ReporteBarrasCardSkeleton />
-            <ReporteBarrasCardSkeleton />
-          </div>
+          <>
+            <div className="space-y-6">
+              {/* Hero card skeleton */}
+              <Card className="overflow-hidden border-2">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-3 flex-1">
+                      <Skeleton className="h-6 w-48" />
+                      <Skeleton className="h-10 w-64" />
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-12 w-24" />
+                  </div>
+                  <Skeleton className="h-2 w-full" />
+                </CardContent>
+              </Card>
+              
+              {/* Secondary metrics skeleton */}
+              <div className="grid gap-4 md:grid-cols-3">
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+              </div>
+              
+              {/* Top performers skeleton */}
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-5 w-32" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="grid items-stretch gap-5 lg:grid-cols-2">
+              <ReporteBarrasCardSkeleton />
+              <ReporteBarrasCardSkeleton />
+              <ReporteBarrasCardSkeleton />
+              <ReporteBarrasCardSkeleton />
+            </div>
+          </>
         )}
         {state === "error" && displayError && (
           <div className="flex flex-col items-center gap-4 py-16 text-center">
@@ -95,14 +149,19 @@ export function CobrosContent({
           </div>
         )}
         {state === "success" && (
-          <div className="grid items-stretch gap-5 lg:grid-cols-2">
-            <ReportePorMedioCard reportePorMedio={reportePorMedio} />
-            <ReportePorTipoDocumentoCard
-              reportePorTipoDocumento={reportePorTipoDocumento}
-            />
-            <ReportePorMunicipioCard reportePorMunicipio={reportePorMunicipio} />
-            <ReporteCobrosZonaCard reportePorZona={reportePorZona} />
-          </div>
+          <>
+            {kpisState === "success" && cobrosKpis && (
+              <CobrosKpiCards kpis={cobrosKpis} />
+            )}
+            <div className="grid items-stretch gap-5 lg:grid-cols-2">
+              <ReportePorMedioCard reportePorMedio={reportePorMedio} />
+              <ReportePorTipoDocumentoCard
+                reportePorTipoDocumento={reportePorTipoDocumento}
+              />
+              <ReportePorMunicipioCard reportePorMunicipio={reportePorMunicipio} />
+              <ReporteCobrosZonaCard reportePorZona={reportePorZona} />
+            </div>
+          </>
         )}
       </div>
     </>
