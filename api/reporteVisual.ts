@@ -120,3 +120,21 @@ export const getVentaDetalle2 =
   createReporteFetcher<ReportePorZonaDetalle>(
     API_ENDPOINTS.reporteVisual.ventaDetalle2
   );
+
+/**
+ * Obtiene el reporte detalle_3 para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getVentaDetalle3 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.ventaDetalle3
+  );
+
+/**
+ * Obtiene el reporte por tipo de crédito (venta/detalle_4) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getVentaDetalle4 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.ventaDetalle4
+  );

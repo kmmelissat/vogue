@@ -6,6 +6,8 @@ const BASE_URL =
 const VALID_SUB_ENDPOINTS: [string, string][] = [
   ["venta", "detalle_1"],
   ["venta", "detalle_2"],
+  ["venta", "detalle_3"],
+  ["venta", "detalle_4"],
 ];
 
 export async function POST(

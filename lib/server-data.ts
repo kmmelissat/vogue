@@ -5,6 +5,8 @@ import {
   getReclutamientos,
   getVentaDetalle1,
   getVentaDetalle2,
+  getVentaDetalle3,
+  getVentaDetalle4,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
@@ -57,12 +59,16 @@ export async function fetchKpisServer(
 export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
   reportePorZona: ReportePorZonaDetalle | null;
   reportePorImpulsadora: ReportePorZonaDetalle | null;
+  reporteDetalle3: ReportePorZonaDetalle | null;
+  reportePorTipoCredito: ReportePorZonaDetalle | null;
   error: string | null;
 }> {
   try {
-    const [ventaDetalle1Res, ventaDetalle2Res] = await Promise.all([
+    const [ventaDetalle1Res, ventaDetalle2Res, ventaDetalle3Res, ventaDetalle4Res] = await Promise.all([
       getVentaDetalle1(fechas),
       getVentaDetalle2(fechas),
+      getVentaDetalle3(fechas),
+      getVentaDetalle4(fechas),
     ]);
 
     if (!ventaDetalle1Res.success) {
@@ -71,9 +77,17 @@ export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
     if (!ventaDetalle2Res.success) {
       throw new Error(ventaDetalle2Res.error.message);
     }
+    if (!ventaDetalle3Res.success) {
+      throw new Error(ventaDetalle3Res.error.message);
+    }
+    if (!ventaDetalle4Res.success) {
+      throw new Error(ventaDetalle4Res.error.message);
+    }
 
     const reportePorZona = "data" in ventaDetalle1Res ? ventaDetalle1Res.data.detalle : null;
     const reportePorImpulsadora = "data" in ventaDetalle2Res ? ventaDetalle2Res.data.detalle : null;
+    const reporteDetalle3 = "data" in ventaDetalle3Res ? ventaDetalle3Res.data.detalle : null;
+    const reportePorTipoCredito = "data" in ventaDetalle4Res ? ventaDetalle4Res.data.detalle : null;
 
     if (!reportePorZona || !Array.isArray(reportePorZona.datos)) {
       throw new Error("Datos de zona inválidos");
@@ -81,12 +95,20 @@ export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
     if (!reportePorImpulsadora || !Array.isArray(reportePorImpulsadora.datos)) {
       throw new Error("Datos de impulsadora inválidos");
     }
+    if (!reporteDetalle3 || !Array.isArray(reporteDetalle3.datos)) {
+      throw new Error("Datos de detalle 3 inválidos");
+    }
+    if (!reportePorTipoCredito || !Array.isArray(reportePorTipoCredito.datos)) {
+      throw new Error("Datos de tipo de crédito inválidos");
+    }
 
-    return { reportePorZona, reportePorImpulsadora, error: null };
+    return { reportePorZona, reportePorImpulsadora, reporteDetalle3, reportePorTipoCredito, error: null };
   } catch (e) {
     return {
       reportePorZona: null,
       reportePorImpulsadora: null,
+      reporteDetalle3: null,
+      reportePorTipoCredito: null,
       error: e instanceof Error ? e.message : "Error al cargar datos",
     };
   }
