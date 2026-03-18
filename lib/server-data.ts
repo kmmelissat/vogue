@@ -11,10 +11,24 @@ import {
   getCobrosDetalle2,
   getCobrosDetalle3,
   getCobrosDetalle4,
+  getActivosDetalle1,
+  getActivosDetalle2,
+  getActivosDetalle3,
+  getActivosDetalle4,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
 import { calculateKpis } from "./kpis-calculator";
+
+const loggedCalls = new Set<string>();
+
+function shouldLog(key: string): boolean {
+  if (process.env.NODE_ENV !== "development") return false;
+  if (loggedCalls.has(key)) return false;
+  loggedCalls.add(key);
+  setTimeout(() => loggedCalls.delete(key), 100);
+  return true;
+}
 
 export function getDefaultFechas(): FechasParams {
   const now = new Date();
@@ -31,10 +45,16 @@ export async function fetchKpisServer(
   fechas: FechasParams
 ): Promise<{ kpis: ReporteKpis | null; error: string | null }> {
   try {
-    console.log('[Server] 📊 Fetching KPIs:', {
-      endpoints: ['activos', 'cobros', 'venta', 'reclutamientos'],
-      fechas
-    });
+    const logKey = `kpis-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+    const shouldLogThis = shouldLog(logKey);
+    
+    if (shouldLogThis) {
+      console.log('[Server] 📊 Fetching KPIs:', {
+        endpoints: ['activos', 'cobros', 'venta', 'reclutamientos'],
+        fechas
+      });
+    }
+    
     const startTime = performance.now();
     
     const [activosRes, cobrosRes, ventaRes, reclutamientosRes] = await Promise.all([
@@ -45,7 +65,7 @@ export async function fetchKpisServer(
     ]);
     
     const duration = Math.round(performance.now() - startTime);
-    console.log(`[Server] ✅ KPIs fetched in ${duration}ms`);
+    if (shouldLogThis) console.log(`[Server] ✅ KPIs fetched in ${duration}ms`);
 
     if (!activosRes.success) throw new Error(activosRes.error.message);
     if (!cobrosRes.success) throw new Error(cobrosRes.error.message);
@@ -78,16 +98,22 @@ export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
   error: string | null;
 }> {
   try {
-    console.log('[Server] 🛒 Fetching Venta + Detalles:', {
-      endpoints: [
-        'venta (principal)',
-        'venta/detalle_1 (zona)',
-        'venta/detalle_2 (impulsadora)',
-        'venta/detalle_3 (línea)',
-        'venta/detalle_4 (tipo crédito)'
-      ],
-      fechas
-    });
+    const logKey = `venta-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+    const shouldLogThis = shouldLog(logKey);
+    
+    if (shouldLogThis) {
+      console.log('[Server] 🛒 Fetching Venta + Detalles:', {
+        endpoints: [
+          'venta (principal)',
+          'venta/detalle_1 (zona)',
+          'venta/detalle_2 (impulsadora)',
+          'venta/detalle_3 (línea)',
+          'venta/detalle_4 (tipo crédito)'
+        ],
+        fechas
+      });
+    }
+    
     const startTime = performance.now();
     
     const [ventaRes, ventaDetalle1Res, ventaDetalle2Res, ventaDetalle3Res, ventaDetalle4Res] = await Promise.all([
@@ -99,7 +125,7 @@ export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
     ]);
     
     const duration = Math.round(performance.now() - startTime);
-    console.log(`[Server] ✅ Venta + Detalles fetched in ${duration}ms`);
+    if (shouldLogThis) console.log(`[Server] ✅ Venta + Detalles fetched in ${duration}ms`);
 
     if (!ventaRes.success) {
       throw new Error(ventaRes.error.message);
@@ -162,16 +188,22 @@ export async function fetchCobrosDetallesServer(fechas: FechasParams): Promise<{
   error: string | null;
 }> {
   try {
-    console.log('[Server] 💰 Fetching Cobros + Detalles:', {
-      endpoints: [
-        'cobros (principal)',
-        'cobros/detalle_1 (medio)',
-        'cobros/detalle_2 (tipo documento)',
-        'cobros/detalle_3 (municipio)',
-        'cobros/detalle_4 (zona)'
-      ],
-      fechas
-    });
+    const logKey = `cobros-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+    const shouldLogThis = shouldLog(logKey);
+    
+    if (shouldLogThis) {
+      console.log('[Server] 💰 Fetching Cobros + Detalles:', {
+        endpoints: [
+          'cobros (principal)',
+          'cobros/detalle_1 (medio)',
+          'cobros/detalle_2 (tipo documento)',
+          'cobros/detalle_3 (municipio)',
+          'cobros/detalle_4 (zona)'
+        ],
+        fechas
+      });
+    }
+    
     const startTime = performance.now();
     
     const [cobrosRes, cobrosDetalle1Res, cobrosDetalle2Res, cobrosDetalle3Res, cobrosDetalle4Res] = await Promise.all([
@@ -183,7 +215,7 @@ export async function fetchCobrosDetallesServer(fechas: FechasParams): Promise<{
     ]);
     
     const duration = Math.round(performance.now() - startTime);
-    console.log(`[Server] ✅ Cobros + Detalles fetched in ${duration}ms`);
+    if (shouldLogThis) console.log(`[Server] ✅ Cobros + Detalles fetched in ${duration}ms`);
 
     if (!cobrosRes.success) {
       throw new Error(cobrosRes.error.message);
@@ -232,6 +264,88 @@ export async function fetchCobrosDetallesServer(fechas: FechasParams): Promise<{
       reportePorMunicipio: null,
       reportePorZona: null,
       cobrosData: null,
+      error: e instanceof Error ? e.message : "Error al cargar datos",
+    };
+  }
+}
+
+export async function fetchActivosDetallesServer(fechas: FechasParams) {
+  const logKey = `activos-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+  const shouldLogThis = shouldLog(logKey);
+  
+  if (shouldLogThis) {
+    console.log("[Server] 📊 Fetching Activos + Detalles:", {
+      endpoints: [
+        "activos (principal)",
+        "activos/detalle_1 (zona)",
+        "activos/detalle_2 (tipo crédito)",
+        "activos/detalle_3 (rango)",
+        "activos/detalle_4 (año)",
+      ],
+      fechas,
+    });
+  }
+
+  const start = performance.now();
+
+  try {
+    const [activosRes, d1, d2, d3, d4] = await Promise.all([
+      getActivos(fechas),
+      getActivosDetalle1(fechas),
+      getActivosDetalle2(fechas),
+      getActivosDetalle3(fechas),
+      getActivosDetalle4(fechas),
+    ]);
+
+    const elapsed = Math.round(performance.now() - start);
+    if (shouldLogThis) console.log(`[Server] ✅ Activos + Detalles fetched in ${elapsed}ms`);
+
+    if (!activosRes.success) {
+      throw new Error(activosRes.error.message);
+    }
+    if (!d1.success) {
+      throw new Error(d1.error.message);
+    }
+    if (!d2.success) {
+      throw new Error(d2.error.message);
+    }
+    if (!d3.success) {
+      throw new Error(d3.error.message);
+    }
+    if (!d4.success) {
+      throw new Error(d4.error.message);
+    }
+
+    const activosData = "data" in activosRes ? activosRes.data.detalle : null;
+    const reportePorZona = "data" in d1 ? d1.data.detalle : null;
+    const reportePorTipoCredito = "data" in d2 ? d2.data.detalle : null;
+    const reportePorRango = "data" in d3 ? d3.data.detalle : null;
+    const reportePorAnio = "data" in d4 ? d4.data.detalle : null;
+
+    if (!activosData) {
+      throw new Error("Datos de activos principal inválidos");
+    }
+    if (!reportePorZona || !Array.isArray(reportePorZona.datos)) {
+      throw new Error("Datos de zona inválidos");
+    }
+    if (!reportePorTipoCredito || !Array.isArray(reportePorTipoCredito.datos)) {
+      throw new Error("Datos de tipo crédito inválidos");
+    }
+    if (!reportePorRango || !Array.isArray(reportePorRango.datos)) {
+      throw new Error("Datos de rango inválidos");
+    }
+    if (!reportePorAnio || !Array.isArray(reportePorAnio.datos)) {
+      throw new Error("Datos de año inválidos");
+    }
+
+    return { reportePorZona, reportePorTipoCredito, reportePorRango, reportePorAnio, activosData, error: null };
+  } catch (e) {
+    return {
+      reportePorZona: null,
+      reportePorTipoCredito: null,
+      reportePorRango: null,
+      reportePorAnio: null,
+      activosData: null,
       error: e instanceof Error ? e.message : "Error al cargar datos",
     };
   }

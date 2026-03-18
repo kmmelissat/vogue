@@ -176,3 +176,39 @@ export const getCobrosDetalle4 =
   createReporteFetcher<ReportePorZonaDetalle>(
     API_ENDPOINTS.reporteVisual.cobrosDetalle4
   );
+
+/**
+ * Obtiene el reporte de activos por zona (activos/detalle_1) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getActivosDetalle1 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.activosDetalle1
+  );
+
+/**
+ * Obtiene el reporte de activos por tipo de crédito (activos/detalle_2) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getActivosDetalle2 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.activosDetalle2
+  );
+
+/**
+ * Obtiene el reporte de activos por rango (activos/detalle_3) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getActivosDetalle3 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.activosDetalle3
+  );
+
+/**
+ * Obtiene el reporte de activos por año (activos/detalle_4) para el rango de fechas indicado.
+ * Misma estructura: titulo_reporte y datos (Etiqueta, Valor).
+ */
+export const getActivosDetalle4 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.activosDetalle4
+  );

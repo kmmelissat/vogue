@@ -25,4 +25,11 @@ export const queryKeys = {
    */
   cobrosDetalles: (fechas: FechasParams | null) => 
     ["cobros", "detalles", fechas] as const,
+  
+  /**
+   * Key para los detalles de activos (zona + tipo crédito + rango + año)
+   * @example ["activos", "detalles", { fecha_inicio: "2026-03-01", fecha_fin: "2026-03-31" }]
+   */
+  activosDetalles: (fechas: FechasParams | null) => 
+    ["activos", "detalles", fechas] as const,
 };

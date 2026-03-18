@@ -28,6 +28,7 @@ const NAV_ITEMS: SidebarItem[] = [
   { id: "home", label: "Inicio", href: "/", icon: <Home className="h-5 w-5" /> },
   { id: "ventas", label: "Ventas", href: "/ventas", icon: <ShoppingCart className="h-5 w-5" /> },
   { id: "cobros", label: "Cobros", href: "/cobros", icon: <HandCoins className="h-5 w-5" /> },
+  { id: "activos", label: "Activos", href: "/activos", icon: <LayoutDashboard className="h-5 w-5" /> },
   { id: "reclutamientos", label: "Reclutamientos", href: "/#reclutamientos", icon: <Users className="h-5 w-5" /> },
 ];
 
