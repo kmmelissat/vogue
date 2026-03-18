@@ -7,78 +7,44 @@ import {
   getVentaDetalle2,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
-import { parseNumberLabel } from "@/lib/utils";
-import { getDateRangeByPeriod } from "@/lib/date-utils";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
-
-const DEFAULT_PERIOD = "30dias";
+import { calculateKpis } from "./kpis-calculator";
 
 export function getDefaultFechas(): FechasParams {
-  return getDateRangeByPeriod(DEFAULT_PERIOD);
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now);
+  thirtyDaysAgo.setDate(now.getDate() - 30);
+
+  return {
+    fecha_inicio: thirtyDaysAgo.toISOString().split("T")[0],
+    fecha_fin: now.toISOString().split("T")[0],
+  };
 }
 
-/**
- * Fetch inicial de KPIs desde el servidor (sin detalles de venta).
- * Se ejecuta en Server Component para SSR.
- */
 export async function fetchKpisServer(
-  fechas: FechasParams = getDefaultFechas()
+  fechas: FechasParams
 ): Promise<{ kpis: ReporteKpis | null; error: string | null }> {
   try {
-    const [activosRes, cobrosRes, ventaRes, reclutamientosRes] =
-      await Promise.all([
-        getActivos(fechas),
-        getCobros(fechas),
-        getVenta(fechas),
-        getReclutamientos(fechas),
-      ]);
+    const [activosRes, cobrosRes, ventaRes, reclutamientosRes] = await Promise.all([
+      getActivos(fechas),
+      getCobros(fechas),
+      getVenta(fechas),
+      getReclutamientos(fechas),
+    ]);
 
-    if (!activosRes.success) {
-      return { kpis: null, error: activosRes.error.message };
-    }
-    if (!cobrosRes.success) {
-      return { kpis: null, error: cobrosRes.error.message };
-    }
-    if (!ventaRes.success) {
-      return { kpis: null, error: ventaRes.error.message };
-    }
-    if (!reclutamientosRes.success) {
-      return { kpis: null, error: reclutamientosRes.error.message };
-    }
+    if (!activosRes.success) throw new Error(activosRes.error.message);
+    if (!cobrosRes.success) throw new Error(cobrosRes.error.message);
+    if (!ventaRes.success) throw new Error(ventaRes.error.message);
+    if (!reclutamientosRes.success) throw new Error(reclutamientosRes.error.message);
 
     const a = "data" in activosRes ? activosRes.data.detalle : null;
     const c = "data" in cobrosRes ? cobrosRes.data.detalle : null;
     const v = "data" in ventaRes ? ventaRes.data.detalle : null;
     const r = "data" in reclutamientosRes ? reclutamientosRes.data.detalle : 0;
 
-    if (!a || !c || !v) {
-      return { kpis: null, error: "Datos incompletos" };
-    }
+    if (!a || !c || !v) throw new Error("Datos incompletos");
 
-    const dias = a.dias || c.dias || v.dias || 1;
-    const devoluciones = parseNumberLabel(v.devoluciones_label);
-    const anulaciones = parseNumberLabel(c.anulaciones_label);
-
-    const kpis: ReporteKpis = {
-      activoNeto: a.activo_neto,
-      cobroBruto: c.cobro_bruto,
-      cobroNeto: c.cobro_neto,
-      ventaBruta: v.venta_bruta,
-      ventaNeta: v.venta_neta,
-      devoluciones,
-      anulaciones,
-      reclutamientos: r,
-      arpu: a.activo_neto > 0 ? c.cobro_neto / a.activo_neto : 0,
-      cobroPromedioDia: dias > 0 ? c.cobro_neto / dias : 0,
-      ventaPromedioDia: dias > 0 ? v.venta_neta / dias : 0,
-      pctDevoluciones:
-        v.venta_bruta > 0 ? (devoluciones / v.venta_bruta) * 100 : 0,
-      pctAnulaciones: c.cobro_bruto > 0 ? (anulaciones / c.cobro_bruto) * 100 : 0,
-      ratioCobrosVentas: v.venta_neta > 0 ? c.cobro_neto / v.venta_neta : 0,
-      reclutamientosDia: dias > 0 ? r / dias : 0,
-      dias,
-    };
-
+    const kpis = calculateKpis(a, c, v, r);
     return { kpis, error: null };
   } catch (e) {
     return {
@@ -88,13 +54,7 @@ export async function fetchKpisServer(
   }
 }
 
-/**
- * Fetch inicial de detalles de venta desde el servidor.
- * Se ejecuta en Server Component para SSR.
- */
-export async function fetchVentaDetallesServer(
-  fechas: FechasParams = getDefaultFechas()
-): Promise<{
+export async function fetchVentaDetallesServer(fechas: FechasParams): Promise<{
   reportePorZona: ReportePorZonaDetalle | null;
   reportePorImpulsadora: ReportePorZonaDetalle | null;
   error: string | null;
@@ -105,30 +65,21 @@ export async function fetchVentaDetallesServer(
       getVentaDetalle2(fechas),
     ]);
 
-    let reportePorZona: ReportePorZonaDetalle | null = null;
-    let reportePorImpulsadora: ReportePorZonaDetalle | null = null;
-
-    if (ventaDetalle1Res.success && "data" in ventaDetalle1Res) {
-      const detalle = ventaDetalle1Res.data.detalle;
-      reportePorZona = detalle && Array.isArray(detalle.datos) ? detalle : null;
-    } else {
-      return {
-        reportePorZona: null,
-        reportePorImpulsadora: null,
-        error: ventaDetalle1Res.error.message,
-      };
+    if (!ventaDetalle1Res.success) {
+      throw new Error(ventaDetalle1Res.error.message);
+    }
+    if (!ventaDetalle2Res.success) {
+      throw new Error(ventaDetalle2Res.error.message);
     }
 
-    if (ventaDetalle2Res.success && "data" in ventaDetalle2Res) {
-      const detalle = ventaDetalle2Res.data.detalle;
-      reportePorImpulsadora =
-        detalle && Array.isArray(detalle.datos) ? detalle : null;
-    } else {
-      return {
-        reportePorZona: null,
-        reportePorImpulsadora: null,
-        error: ventaDetalle2Res.error.message,
-      };
+    const reportePorZona = "data" in ventaDetalle1Res ? ventaDetalle1Res.data.detalle : null;
+    const reportePorImpulsadora = "data" in ventaDetalle2Res ? ventaDetalle2Res.data.detalle : null;
+
+    if (!reportePorZona || !Array.isArray(reportePorZona.datos)) {
+      throw new Error("Datos de zona inválidos");
+    }
+    if (!reportePorImpulsadora || !Array.isArray(reportePorImpulsadora.datos)) {
+      throw new Error("Datos de impulsadora inválidos");
     }
 
     return { reportePorZona, reportePorImpulsadora, error: null };

@@ -25,20 +25,19 @@ export function DashboardContent({ initialKpis, initialFechas, initialError }: D
   const [fechas, setFechas] = React.useState<FechasParams | null>(initialFechas);
   const { kpis, state, error, retry } = useReporteData(fechas, {
     initialData: initialKpis,
-    initialFechas,
   });
 
   const displayError = error ?? initialError;
 
   return (
     <>
-      <DashboardHeader onDateChange={setFechas} onRefresh={retry} />
+      <DashboardHeader onDateChange={setFechas} onRefresh={() => retry()} />
       <div className="flex-1 p-6">
         {(state === "idle" || state === "loading") && <DashboardSkeleton />}
         {state === "error" && displayError && (
           <div className="flex flex-col items-center gap-4 py-16 text-center">
             <p className="text-destructive">{displayError}</p>
-            <Button variant="outline" size="sm" onClick={retry}>
+            <Button variant="outline" size="sm" onClick={() => retry()}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Reintentar
             </Button>
