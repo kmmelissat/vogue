@@ -5,11 +5,14 @@ import { useCobrosDetalles } from "@/hooks/use-cobros-detalles";
 import { useCobrosKpis } from "@/hooks/use-cobros-kpis";
 import type { ReportePorZonaDetalle, FechasParams } from "@/api/types";
 import { DashboardHeader } from "./dashboard-header";
-import { ReportePorMedioCard } from "./charts/reporte-por-medio-card";
-import { ReportePorTipoDocumentoCard } from "./charts/reporte-por-tipo-documento-card";
+import { ReportePorMedioPieCard } from "./charts/reporte-por-medio-pie-card";
 import { ReportePorMunicipioCard } from "./charts/reporte-por-municipio-card";
 import { ReporteCobrosZonaCard } from "./charts/reporte-cobros-por-zona-card";
 import { CobrosKpiCards } from "./kpis/cobros-kpi-cards";
+import { AnalisisEficienciaCobros } from "./charts/analisis-eficiencia-cobros";
+import { RankingZonasCobros } from "./charts/ranking-zonas-cobros";
+import { MixDocumentosChart } from "./charts/mix-documentos-chart";
+import { MapaCalorMunicipios } from "./charts/mapa-calor-municipios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,14 +156,29 @@ export function CobrosContent({
             {kpisState === "success" && cobrosKpis && (
               <CobrosKpiCards kpis={cobrosKpis} />
             )}
+            
+            {/* Análisis de Eficiencia */}
+            {kpisState === "success" && cobrosKpis && (
+              <AnalisisEficienciaCobros kpis={cobrosKpis} />
+            )}
+
+            {/* Visualizaciones principales */}
             <div className="grid items-stretch gap-5 lg:grid-cols-2">
-              <ReportePorMedioCard reportePorMedio={reportePorMedio} />
-              <ReportePorTipoDocumentoCard
-                reportePorTipoDocumento={reportePorTipoDocumento}
-              />
+              <ReportePorMedioPieCard reportePorMedio={reportePorMedio} />
+              <MixDocumentosChart reportePorTipoDocumento={reportePorTipoDocumento} />
+            </div>
+
+            {/* Gráficos de barras originales */}
+            <div className="grid items-stretch gap-5 lg:grid-cols-2">
               <ReportePorMunicipioCard reportePorMunicipio={reportePorMunicipio} />
               <ReporteCobrosZonaCard reportePorZona={reportePorZona} />
             </div>
+
+            {/* Ranking de Zonas - Ancho completo */}
+            <RankingZonasCobros reportePorZona={reportePorZona} />
+
+            {/* Mapa de Calor de Municipios - Ancho completo */}
+            <MapaCalorMunicipios reportePorMunicipio={reportePorMunicipio} />
           </>
         )}
       </div>
