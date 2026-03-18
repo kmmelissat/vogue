@@ -15,7 +15,10 @@ export type DashboardHeaderProps = {
   onRefresh?: () => void;
 };
 
-export function DashboardHeader({ onDateChange, onRefresh }: DashboardHeaderProps) {
+export function DashboardHeader({
+  onDateChange,
+  onRefresh,
+}: DashboardHeaderProps) {
   const {
     period,
     dateRange,
@@ -80,7 +83,11 @@ export function DashboardHeader({ onDateChange, onRefresh }: DashboardHeaderProp
             title={isDark ? "Modo claro" : "Modo oscuro"}
             className="h-8 w-8"
           >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {isDark ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </div>

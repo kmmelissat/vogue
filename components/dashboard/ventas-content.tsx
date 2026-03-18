@@ -52,7 +52,9 @@ export function VentasContent({
   initialFechas,
   initialError,
 }: VentasContentProps) {
-  const [fechas, setFechas] = React.useState<FechasParams | null>(initialFechas);
+  const [fechas, setFechas] = React.useState<FechasParams | null>(
+    initialFechas,
+  );
   const { reportePorZona, reportePorImpulsadora, state, error, retry } =
     useVentaDetalles(fechas, {
       initialReportePorZona,
@@ -83,7 +85,9 @@ export function VentasContent({
         {state === "success" && (
           <div className="grid items-stretch gap-5 lg:grid-cols-2">
             <ReportePorZonaCard reportePorZona={reportePorZona} />
-            <ReportePorImpulsadoraCard reportePorImpulsadora={reportePorImpulsadora} />
+            <ReportePorImpulsadoraCard
+              reportePorImpulsadora={reportePorImpulsadora}
+            />
           </div>
         )}
       </div>

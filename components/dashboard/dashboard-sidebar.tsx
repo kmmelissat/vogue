@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import NProgress from "nprogress";
 import {
   Home,
   ShoppingCart,
@@ -46,9 +47,14 @@ export function DashboardSidebar() {
       if (pathname === "/") {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
       } else {
+        NProgress.start();
         router.push(item.href);
       }
     }
+  };
+
+  const handleLinkClick = () => {
+    NProgress.start();
   };
 
   return (
@@ -75,7 +81,7 @@ export function DashboardSidebar() {
                   {item.icon}
                 </button>
               ) : (
-                <Link href={item.href} className={classes}>
+                <Link href={item.href} className={classes} onClick={handleLinkClick}>
                   {item.icon}
                 </Link>
               )}
@@ -91,6 +97,7 @@ export function DashboardSidebar() {
         <TooltipTrigger asChild>
           <Link
             href="/personalizable"
+            onClick={handleLinkClick}
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
               pathname === "/personalizable"

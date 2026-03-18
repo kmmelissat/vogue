@@ -17,7 +17,7 @@ type UseVentaDetallesOptions = {
 
 async function fetchVentaDetalles(
   params: FechasParams,
-  signal: AbortSignal
+  signal: AbortSignal,
 ): Promise<VentaDetalles> {
   const [ventaDetalle1Res, ventaDetalle2Res] = await Promise.all([
     getVentaDetalle1(params, signal),
@@ -31,8 +31,10 @@ async function fetchVentaDetalles(
     throw new Error(ventaDetalle2Res.error.message);
   }
 
-  const reportePorZona = "data" in ventaDetalle1Res ? ventaDetalle1Res.data.detalle : null;
-  const reportePorImpulsadora = "data" in ventaDetalle2Res ? ventaDetalle2Res.data.detalle : null;
+  const reportePorZona =
+    "data" in ventaDetalle1Res ? ventaDetalle1Res.data.detalle : null;
+  const reportePorImpulsadora =
+    "data" in ventaDetalle2Res ? ventaDetalle2Res.data.detalle : null;
 
   if (!reportePorZona || !Array.isArray(reportePorZona.datos)) {
     throw new Error("Datos de zona inválidos");
@@ -46,12 +48,15 @@ async function fetchVentaDetalles(
 
 export function useVentaDetalles(
   fechas: FechasParams | null,
-  options: UseVentaDetallesOptions = {}
+  options: UseVentaDetallesOptions = {},
 ) {
   const { initialReportePorZona, initialReportePorImpulsadora } = options;
   const initialData =
     initialReportePorZona || initialReportePorImpulsadora
-      ? { reportePorZona: initialReportePorZona, reportePorImpulsadora: initialReportePorImpulsadora }
+      ? {
+          reportePorZona: initialReportePorZona,
+          reportePorImpulsadora: initialReportePorImpulsadora,
+        }
       : undefined;
 
   const query = useQuery({
@@ -71,10 +76,10 @@ export function useVentaDetalles(
     state: query.isLoading
       ? "loading"
       : query.isError
-      ? "error"
-      : query.isSuccess
-      ? "success"
-      : "idle",
+        ? "error"
+        : query.isSuccess
+          ? "success"
+          : "idle",
     error: query.error instanceof Error ? query.error.message : null,
     retry: query.refetch,
     lastUpdated: query.dataUpdatedAt ? new Date(query.dataUpdatedAt) : null,

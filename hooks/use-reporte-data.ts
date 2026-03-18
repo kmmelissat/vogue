@@ -34,18 +34,23 @@ type UseReporteDataOptions = {
   initialData?: ReporteKpis | null;
 };
 
-async function fetchKpis(params: FechasParams, signal: AbortSignal): Promise<ReporteKpis> {
-  const [activosRes, cobrosRes, ventaRes, reclutamientosRes] = await Promise.all([
-    getActivos(params, signal),
-    getCobros(params, signal),
-    getVenta(params, signal),
-    getReclutamientos(params, signal),
-  ]);
+async function fetchKpis(
+  params: FechasParams,
+  signal: AbortSignal,
+): Promise<ReporteKpis> {
+  const [activosRes, cobrosRes, ventaRes, reclutamientosRes] =
+    await Promise.all([
+      getActivos(params, signal),
+      getCobros(params, signal),
+      getVenta(params, signal),
+      getReclutamientos(params, signal),
+    ]);
 
   if (!activosRes.success) throw new Error(activosRes.error.message);
   if (!cobrosRes.success) throw new Error(cobrosRes.error.message);
   if (!ventaRes.success) throw new Error(ventaRes.error.message);
-  if (!reclutamientosRes.success) throw new Error(reclutamientosRes.error.message);
+  if (!reclutamientosRes.success)
+    throw new Error(reclutamientosRes.error.message);
 
   const a = "data" in activosRes ? activosRes.data.detalle : null;
   const c = "data" in cobrosRes ? cobrosRes.data.detalle : null;
@@ -59,7 +64,7 @@ async function fetchKpis(params: FechasParams, signal: AbortSignal): Promise<Rep
 
 export function useReporteData(
   fechas: FechasParams | null,
-  options: UseReporteDataOptions = {}
+  options: UseReporteDataOptions = {},
 ) {
   const query = useQuery({
     queryKey: queryKeys.reporteKpis(fechas),
@@ -77,10 +82,10 @@ export function useReporteData(
     state: query.isLoading
       ? "loading"
       : query.isError
-      ? "error"
-      : query.isSuccess
-      ? "success"
-      : "idle",
+        ? "error"
+        : query.isSuccess
+          ? "success"
+          : "idle",
     error: query.error instanceof Error ? query.error.message : null,
     retry: query.refetch,
     lastUpdated: query.dataUpdatedAt ? new Date(query.dataUpdatedAt) : null,

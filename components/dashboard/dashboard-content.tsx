@@ -21,8 +21,14 @@ type DashboardContentProps = {
   initialError: string | null;
 };
 
-export function DashboardContent({ initialKpis, initialFechas, initialError }: DashboardContentProps) {
-  const [fechas, setFechas] = React.useState<FechasParams | null>(initialFechas);
+export function DashboardContent({
+  initialKpis,
+  initialFechas,
+  initialError,
+}: DashboardContentProps) {
+  const [fechas, setFechas] = React.useState<FechasParams | null>(
+    initialFechas,
+  );
   const { kpis, state, error, retry } = useReporteData(fechas, {
     initialData: initialKpis,
   });
