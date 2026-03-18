@@ -11,9 +11,7 @@ export type DashboardHeaderProps = {
   onDateChange?: (params: FechasParams) => void;
 };
 
-export function DashboardHeader({
-  onDateChange,
-}: DashboardHeaderProps) {
+export function DashboardHeader({ onDateChange }: DashboardHeaderProps) {
   const {
     period,
     dateRange,
