@@ -212,3 +212,39 @@ export const getActivosDetalle4 =
   createReporteFetcher<ReportePorZonaDetalle>(
     API_ENDPOINTS.reporteVisual.activosDetalle4
   );
+
+/**
+ * Obtiene el reporte de reclutamientos por tipo (reclutamientos/detalle_1).
+ * Incluye titulo_reporte y datos con Etiqueta (tipo) y Valor (cantidad).
+ */
+export const getReclutamientosDetalle1 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.reclutamientosDetalle1
+  );
+
+/**
+ * Obtiene el reporte de reclutamientos por estatus (reclutamientos/detalle_2).
+ * Incluye titulo_reporte y datos con Etiqueta (estatus) y Valor (cantidad).
+ */
+export const getReclutamientosDetalle2 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.reclutamientosDetalle2
+  );
+
+/**
+ * Obtiene el reporte de reclutamientos por estatus (reclutamientos/detalle_3).
+ * Incluye titulo_reporte y datos con Etiqueta (estatus) y Valor (cantidad).
+ */
+export const getReclutamientosDetalle3 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.reclutamientosDetalle3
+  );
+
+/**
+ * Obtiene el reporte de reclutamientos por tipo de crédito (reclutamientos/detalle_4).
+ * Incluye titulo_reporte y datos con Etiqueta (tipo crédito) y Valor (cantidad).
+ */
+export const getReclutamientosDetalle4 =
+  createReporteFetcher<ReportePorZonaDetalle>(
+    API_ENDPOINTS.reporteVisual.reclutamientosDetalle4
+  );

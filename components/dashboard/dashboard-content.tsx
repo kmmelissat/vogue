@@ -3,8 +3,10 @@
 import * as React from "react";
 import { useReporteData } from "@/hooks/use-reporte-data";
 import { useFechasState } from "@/hooks/use-fechas-state";
+import { useDashboardDetalles } from "@/hooks/use-dashboard-detalles";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
 import type { FechasParams } from "@/api/types";
+import type { DashboardDetalles } from "@/lib/server-data";
 import { DashboardHeader } from "./dashboard-header";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 import { KpiCards } from "./kpis/kpi-cards";
@@ -12,6 +14,8 @@ import { VentasVsCobrosChart } from "./charts/ventas-vs-cobros-chart";
 import { DesgloseVentasWaterfall } from "./charts/desglose-ventas-waterfall";
 import { ComposicionCobrosChart } from "./charts/composicion-cobros-chart";
 import { ReclutamientosCard } from "./charts/reclutamientos-card";
+import { ComparativoVentasCobrosPorZona } from "./charts/comparativo-ventas-cobros-por-zona";
+import { ComparativoActivosVentasTipoCredito } from "./charts/comparativo-activos-ventas-tipo-credito";
 import { ExportExcelButton } from "./export-excel-button";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -20,22 +24,43 @@ type DashboardContentProps = {
   initialKpis: ReporteKpis | null;
   initialFechas: FechasParams;
   initialError: string | null;
+  initialDashboardDetalles?: DashboardDetalles | null;
+  initialDashboardDetallesError?: string | null;
 };
 
 export function DashboardContent({
   initialKpis,
   initialFechas,
   initialError,
+  initialDashboardDetalles = null,
+  initialDashboardDetallesError = null,
 }: DashboardContentProps) {
-  const { fechas, isInitialFechas, initialDataTimestamp, onDateChange } = 
+  const { fechas, isInitialFechas, initialDataTimestamp, onDateChange } =
     useFechasState({ initialFechas });
-  
+
   const { kpis, state, error, retry } = useReporteData(fechas, {
     initialData: isInitialFechas ? initialKpis : undefined,
     initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
   });
 
+  const {
+    ventaPorZona,
+    cobrosPorZona,
+    activosPorTipoCredito,
+    ventaPorTipoCredito,
+    state: detallesState,
+  } = useDashboardDetalles(fechas, {
+    initialData: isInitialFechas ? initialDashboardDetalles ?? undefined : undefined,
+    initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
+  });
+
   const displayError = error ?? initialError;
+  const showComparativos =
+    detallesState === "success" &&
+    ventaPorZona &&
+    cobrosPorZona &&
+    activosPorTipoCredito &&
+    ventaPorTipoCredito;
 
   return (
     <>
@@ -63,6 +88,18 @@ export function DashboardContent({
               <ComposicionCobrosChart kpis={kpis} />
               <ReclutamientosCard kpis={kpis} />
             </div>
+            {showComparativos && (
+              <div className="grid items-stretch gap-5 lg:grid-cols-2">
+                <ComparativoVentasCobrosPorZona
+                  ventaPorZona={ventaPorZona}
+                  cobrosPorZona={cobrosPorZona}
+                />
+                <ComparativoActivosVentasTipoCredito
+                  activosPorTipoCredito={activosPorTipoCredito}
+                  ventaPorTipoCredito={ventaPorTipoCredito}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

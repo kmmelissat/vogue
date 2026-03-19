@@ -32,4 +32,10 @@ export const queryKeys = {
    */
   activosDetalles: (fechas: FechasParams | null) => 
     ["activos", "detalles", fechas] as const,
+
+  /**
+   * Key para los detalles del dashboard (venta/cobros por zona, activos/venta por tipo crédito)
+   */
+  dashboardDetalles: (fechas: FechasParams | null) =>
+    ["dashboard", "detalles", fechas] as const,
 };

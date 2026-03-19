@@ -58,7 +58,7 @@ const NAV_ITEMS: SidebarItem[] = [
   {
     id: "reclutamientos",
     label: "Reclutamientos",
-    href: "/#reclutamientos",
+    href: "/reclutamientos",
     icon: <UserRoundPlus className="h-5 w-5" />,
   },
 ];

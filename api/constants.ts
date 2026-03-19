@@ -26,6 +26,10 @@ export const API_ENDPOINTS = {
     ventaDetalle3: "/reporte_visual/venta/detalle_3",
     ventaDetalle4: "/reporte_visual/venta/detalle_4",
     reclutamientos: "/reporte_visual/reclutamientos",
+    reclutamientosDetalle1: "/reporte_visual/reclutamientos/detalle_1",
+    reclutamientosDetalle2: "/reporte_visual/reclutamientos/detalle_2",
+    reclutamientosDetalle3: "/reporte_visual/reclutamientos/detalle_3",
+    reclutamientosDetalle4: "/reporte_visual/reclutamientos/detalle_4",
   },
 } as const;
 

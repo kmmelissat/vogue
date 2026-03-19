@@ -15,6 +15,10 @@ import {
   getActivosDetalle2,
   getActivosDetalle3,
   getActivosDetalle4,
+  getReclutamientosDetalle1,
+  getReclutamientosDetalle2,
+  getReclutamientosDetalle3,
+  getReclutamientosDetalle4,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
@@ -86,6 +90,81 @@ export async function fetchKpisServer(
     return {
       kpis: null,
       error: e instanceof Error ? e.message : "Error al cargar datos",
+    };
+  }
+}
+
+export type DashboardDetalles = {
+  ventaPorZona: ReportePorZonaDetalle | null;
+  cobrosPorZona: ReportePorZonaDetalle | null;
+  activosPorTipoCredito: ReportePorZonaDetalle | null;
+  ventaPorTipoCredito: ReportePorZonaDetalle | null;
+};
+
+export async function fetchDashboardDetallesServer(
+  fechas: FechasParams
+): Promise<{ data: DashboardDetalles | null; error: string | null }> {
+  try {
+    const logKey = `dashboard-detalles-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+    const shouldLogThis = shouldLog(logKey);
+    if (shouldLogThis) {
+      console.log("[Server] 📊 Fetching dashboard detalles:", {
+        endpoints: [
+          "venta/detalle_1 (zona)",
+          "cobros/detalle_4 (zona)",
+          "activos/detalle_2 (tipo crédito)",
+          "venta/detalle_4 (tipo crédito)",
+        ],
+        fechas,
+      });
+    }
+    const startTime = performance.now();
+
+    const [ventaZonaRes, cobrosZonaRes, activosTipoRes, ventaTipoRes] =
+      await Promise.all([
+        getVentaDetalle1(fechas),
+        getCobrosDetalle4(fechas),
+        getActivosDetalle2(fechas),
+        getVentaDetalle4(fechas),
+      ]);
+
+    const duration = Math.round(performance.now() - startTime);
+    if (shouldLogThis) console.log(`[Server] ✅ Dashboard detalles fetched in ${duration}ms`);
+
+    if (!ventaZonaRes.success) throw new Error(ventaZonaRes.error.message);
+    if (!cobrosZonaRes.success) throw new Error(cobrosZonaRes.error.message);
+    if (!activosTipoRes.success) throw new Error(activosTipoRes.error.message);
+    if (!ventaTipoRes.success) throw new Error(ventaTipoRes.error.message);
+
+    const ventaPorZona =
+      "data" in ventaZonaRes ? ventaZonaRes.data.detalle : null;
+    const cobrosPorZona =
+      "data" in cobrosZonaRes ? cobrosZonaRes.data.detalle : null;
+    const activosPorTipoCredito =
+      "data" in activosTipoRes ? activosTipoRes.data.detalle : null;
+    const ventaPorTipoCredito =
+      "data" in ventaTipoRes ? ventaTipoRes.data.detalle : null;
+
+    if (!ventaPorZona?.datos) throw new Error("Datos venta por zona inválidos");
+    if (!cobrosPorZona?.datos) throw new Error("Datos cobros por zona inválidos");
+    if (!activosPorTipoCredito?.datos)
+      throw new Error("Datos activos por tipo crédito inválidos");
+    if (!ventaPorTipoCredito?.datos)
+      throw new Error("Datos venta por tipo crédito inválidos");
+
+    return {
+      data: {
+        ventaPorZona,
+        cobrosPorZona,
+        activosPorTipoCredito,
+        ventaPorTipoCredito,
+      },
+      error: null,
+    };
+  } catch (e) {
+    return {
+      data: null,
+      error: e instanceof Error ? e.message : "Error al cargar detalles",
     };
   }
 }
@@ -347,6 +426,92 @@ export async function fetchActivosDetallesServer(fechas: FechasParams) {
       reportePorRango: null,
       reportePorAnio: null,
       activosData: null,
+      error: e instanceof Error ? e.message : "Error al cargar datos",
+    };
+  }
+}
+
+export async function fetchReclutamientosDetallesServer(fechas: FechasParams): Promise<{
+  reportePorTipo: ReportePorZonaDetalle | null;
+  reportePorEstatus: ReportePorZonaDetalle | null;
+  reporteDetalle3: ReportePorZonaDetalle | null;
+  reportePorTipoCredito: ReportePorZonaDetalle | null;
+  reclutamientosData: number | null;
+  error: string | null;
+}> {
+  try {
+    const logKey = `reclutamientos-${fechas.fecha_inicio}-${fechas.fecha_fin}`;
+    const shouldLogThis = shouldLog(logKey);
+    
+    if (shouldLogThis) {
+      console.log('[Server] 👥 Fetching Reclutamientos + Detalles:', {
+        endpoints: [
+          'reclutamientos (principal)',
+          'reclutamientos/detalle_1 (tipo)',
+          'reclutamientos/detalle_2 (estatus)',
+          'reclutamientos/detalle_3 (estatus)',
+          'reclutamientos/detalle_4 (tipo crédito)'
+        ],
+        fechas
+      });
+    }
+    
+    const startTime = performance.now();
+    
+    const [reclutamientosRes, detalle1Res, detalle2Res, detalle3Res, detalle4Res] = await Promise.all([
+      getReclutamientos(fechas),
+      getReclutamientosDetalle1(fechas),
+      getReclutamientosDetalle2(fechas),
+      getReclutamientosDetalle3(fechas),
+      getReclutamientosDetalle4(fechas),
+    ]);
+    
+    const duration = Math.round(performance.now() - startTime);
+    if (shouldLogThis) console.log(`[Server] ✅ Reclutamientos + Detalles fetched in ${duration}ms`);
+
+    if (!reclutamientosRes.success) {
+      throw new Error(reclutamientosRes.error.message);
+    }
+    if (!detalle1Res.success) {
+      throw new Error(detalle1Res.error.message);
+    }
+    if (!detalle2Res.success) {
+      throw new Error(detalle2Res.error.message);
+    }
+    if (!detalle3Res.success) {
+      throw new Error(detalle3Res.error.message);
+    }
+    if (!detalle4Res.success) {
+      throw new Error(detalle4Res.error.message);
+    }
+
+    const reclutamientosData = "data" in reclutamientosRes ? reclutamientosRes.data.detalle : null;
+    const reportePorTipo = "data" in detalle1Res ? detalle1Res.data.detalle : null;
+    const reportePorEstatus = "data" in detalle2Res ? detalle2Res.data.detalle : null;
+    const reporteDetalle3 = "data" in detalle3Res ? detalle3Res.data.detalle : null;
+    const reportePorTipoCredito = "data" in detalle4Res ? detalle4Res.data.detalle : null;
+
+    if (!reportePorTipo || !Array.isArray(reportePorTipo.datos)) {
+      throw new Error("Datos de tipo inválidos");
+    }
+    if (!reportePorEstatus || !Array.isArray(reportePorEstatus.datos)) {
+      throw new Error("Datos de estatus inválidos");
+    }
+    if (!reporteDetalle3 || !Array.isArray(reporteDetalle3.datos)) {
+      throw new Error("Datos de detalle 3 inválidos");
+    }
+    if (!reportePorTipoCredito || !Array.isArray(reportePorTipoCredito.datos)) {
+      throw new Error("Datos de tipo de crédito inválidos");
+    }
+
+    return { reportePorTipo, reportePorEstatus, reporteDetalle3, reportePorTipoCredito, reclutamientosData, error: null };
+  } catch (e) {
+    return {
+      reportePorTipo: null,
+      reportePorEstatus: null,
+      reporteDetalle3: null,
+      reportePorTipoCredito: null,
+      reclutamientosData: null,
       error: e instanceof Error ? e.message : "Error al cargar datos",
     };
   }
