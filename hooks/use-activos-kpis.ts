@@ -1,6 +1,9 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
 import { getActivos } from "@/api/reporteVisual";
+import { parseLocalDate } from "@/lib/date-utils";
 import { parseNumberLabel } from "@/lib/utils";
 
 export type ActivosKpis = {
@@ -52,10 +55,15 @@ function calculateActivosKpis(
   fechas: FechasParams
 ): ActivosKpis {
   const totalActivos = activosData?.total_activos ?? 0;
-  
-  const fechaInicio = new Date(fechas.fecha_inicio);
-  const fechaFin = new Date(fechas.fecha_fin);
-  const dias = Math.max(1, Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+  const fechaInicio = parseLocalDate(fechas.fecha_inicio);
+  const fechaFin = parseLocalDate(fechas.fecha_fin);
+  const dias = Math.max(
+    1,
+    Math.ceil(
+      (fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24),
+    ) + 1,
+  );
   const activosPorDia = totalActivos / dias;
 
   // Tipo de crédito
@@ -235,7 +243,12 @@ export function useActivosKpis(
 
   return {
     kpis: query.data,
-    state: query.isFetching || query.isLoading ? "loading" : query.isError ? "error" : "success",
+    state: query.isFetching || query.isLoading
+      ? "loading"
+      : query.isError
+        ? "error"
+        : "success",
     error: query.error instanceof Error ? query.error.message : null,
+    retry: query.refetch,
   };
 }

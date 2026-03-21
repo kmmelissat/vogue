@@ -6,6 +6,7 @@ import { useCobrosKpis } from "@/hooks/use-cobros-kpis";
 import { useFechasState } from "@/hooks/use-fechas-state";
 import type { ReportePorZonaDetalle, FechasParams } from "@/api/types";
 import { DashboardHeader } from "./dashboard-header";
+import { KpiQueryError } from "./kpi-query-error";
 import { ReportePorMedioPieCard } from "./charts/reporte-por-medio-pie-card";
 import { ReportePorMunicipioCard } from "./charts/reporte-por-municipio-card";
 import { ReporteCobrosZonaCard } from "./charts/reporte-cobros-por-zona-card";
@@ -78,7 +79,12 @@ export function CobrosContent({
       initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
     });
 
-  const { kpis: cobrosKpis, state: kpisState } = useCobrosKpis(fechas, {
+  const {
+    kpis: cobrosKpis,
+    state: kpisState,
+    error: kpisError,
+    retry: retryKpis,
+  } = useCobrosKpis(fechas, {
     reportePorMedio,
     reportePorTipoDocumento,
     reportePorMunicipio,
@@ -91,7 +97,10 @@ export function CobrosContent({
 
   return (
     <>
-      <DashboardHeader onDateChange={onDateChange} />
+      <DashboardHeader
+        initialFechas={initialFechas}
+        onDateChange={onDateChange}
+      />
       <div className="flex-1 p-6 space-y-6">
         {(state === "idle" || state === "loading") && (
           <>
@@ -156,6 +165,9 @@ export function CobrosContent({
         )}
         {state === "success" && (
           <>
+            {kpisState === "error" && kpisError && (
+              <KpiQueryError message={kpisError} onRetry={retryKpis} />
+            )}
             {kpisState === "success" && cobrosKpis && (
               <CobrosKpiCards kpis={cobrosKpis} />
             )}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import {
   formatDateApi,
@@ -18,12 +18,23 @@ const PERIODS: { key: PeriodKey; label: string }[] = [
 
 const DEFAULT_PERIOD: PeriodKey = "30dias";
 
-function getInitialDateRange(): DateRange {
-  const range = getDateRangeByPeriod(DEFAULT_PERIOD);
-  return {
-    from: parseLocalDate(range.fecha_inicio),
-    to: parseLocalDate(range.fecha_fin),
-  };
+export type UseDateRangeOptions = {
+  /** Fechas con las que hidrató el servidor; alinea el calendario y evita onDateChange fantasma al montar. */
+  initialFechas?: FechasParams;
+};
+
+function matchPeriodKey(fechas: FechasParams): PeriodKey | null {
+  const keys: PeriodKey[] = ["hoy", "7dias", "30dias", "mesActual"];
+  for (const key of keys) {
+    const p = getDateRangeByPeriod(key);
+    if (
+      p.fecha_inicio === fechas.fecha_inicio &&
+      p.fecha_fin === fechas.fecha_fin
+    ) {
+      return key;
+    }
+  }
+  return null;
 }
 
 function getPeriodLabel(dateRange: DateRange | undefined): string {
@@ -45,10 +56,33 @@ function dateRangeToFechasParams(range: DateRange | undefined): FechasParams | n
   };
 }
 
-export function useDateRange(onDateChange?: (params: FechasParams) => void) {
-  const initial = useMemo(() => getInitialDateRange(), []);
-  const [period, setPeriod] = useState<PeriodKey | null>(DEFAULT_PERIOD);
-  const [dateRange, setDateRange] = useState<DateRange>(initial);
+export function useDateRange(
+  onDateChange?: (params: FechasParams) => void,
+  options?: UseDateRangeOptions,
+) {
+  const bootstrap = useMemo(() => {
+    if (options?.initialFechas) {
+      const f = options.initialFechas;
+      const range: DateRange = {
+        from: parseLocalDate(f.fecha_inicio),
+        to: parseLocalDate(f.fecha_fin),
+      };
+      return { range, period: matchPeriodKey(f) };
+    }
+    const r = getDateRangeByPeriod(DEFAULT_PERIOD);
+    return {
+      range: {
+        from: parseLocalDate(r.fecha_inicio),
+        to: parseLocalDate(r.fecha_fin),
+      } satisfies DateRange,
+      period: DEFAULT_PERIOD as PeriodKey,
+    };
+  }, [options?.initialFechas?.fecha_inicio, options?.initialFechas?.fecha_fin]);
+
+  const [period, setPeriod] = useState<PeriodKey | null>(() => bootstrap.period);
+  const [dateRange, setDateRange] = useState<DateRange>(() => bootstrap.range);
+
+  const resetRange = bootstrap.range;
 
   const notifyDateChange = useCallback(
     (range: DateRange | undefined) => {
@@ -74,21 +108,17 @@ export function useDateRange(onDateChange?: (params: FechasParams) => void) {
 
   const handleDateRangeChange = useCallback(
     (range: DateRange | undefined) => {
-      setDateRange(range?.from ? range : initial);
+      setDateRange(range?.from ? range : resetRange);
       if (range?.from && range?.to) {
-        setPeriod(null); // Rango manual → no preset seleccionado
+        setPeriod(null);
         notifyDateChange(range);
       }
     },
-    [initial, notifyDateChange],
+    [notifyDateChange, resetRange],
   );
 
-  useEffect(() => {
-    onDateChange?.(getDateRangeByPeriod(DEFAULT_PERIOD));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Solo al montar
-  }, []);
-
-  const periodLabel = period === null ? "Personalizado" : getPeriodLabel(dateRange);
+  const periodLabel =
+    period === null ? "Personalizado" : getPeriodLabel(dateRange);
 
   return {
     period,

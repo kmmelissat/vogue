@@ -17,10 +17,10 @@ import {
   getActivosDetalle4,
   getReclutamientosDetalle1,
   getReclutamientosDetalle2,
-  getReclutamientosDetalle3,
   getReclutamientosDetalle4,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
+import { getDefaultFechas as getDefaultFechasFromCalendar } from "@/lib/date-utils";
 import type { ReporteKpis } from "@/hooks/use-reporte-data";
 import { calculateKpis } from "./kpis-calculator";
 
@@ -35,15 +35,7 @@ function shouldLog(key: string): boolean {
 }
 
 export function getDefaultFechas(): FechasParams {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const thirtyDaysAgo = new Date(today);
-  thirtyDaysAgo.setDate(today.getDate() - 29);
-
-  return {
-    fecha_inicio: thirtyDaysAgo.toISOString().split("T")[0],
-    fecha_fin: today.toISOString().split("T")[0],
-  };
+  return getDefaultFechasFromCalendar();
 }
 
 export async function fetchKpisServer(
@@ -434,7 +426,6 @@ export async function fetchActivosDetallesServer(fechas: FechasParams) {
 export async function fetchReclutamientosDetallesServer(fechas: FechasParams): Promise<{
   reportePorTipo: ReportePorZonaDetalle | null;
   reportePorEstatus: ReportePorZonaDetalle | null;
-  reporteDetalle3: ReportePorZonaDetalle | null;
   reportePorTipoCredito: ReportePorZonaDetalle | null;
   reclutamientosData: number | null;
   error: string | null;
@@ -449,7 +440,6 @@ export async function fetchReclutamientosDetallesServer(fechas: FechasParams): P
           'reclutamientos (principal)',
           'reclutamientos/detalle_1 (tipo)',
           'reclutamientos/detalle_2 (estatus)',
-          'reclutamientos/detalle_3 (estatus)',
           'reclutamientos/detalle_4 (tipo crédito)'
         ],
         fechas
@@ -458,11 +448,10 @@ export async function fetchReclutamientosDetallesServer(fechas: FechasParams): P
     
     const startTime = performance.now();
     
-    const [reclutamientosRes, detalle1Res, detalle2Res, detalle3Res, detalle4Res] = await Promise.all([
+    const [reclutamientosRes, detalle1Res, detalle2Res, detalle4Res] = await Promise.all([
       getReclutamientos(fechas),
       getReclutamientosDetalle1(fechas),
       getReclutamientosDetalle2(fechas),
-      getReclutamientosDetalle3(fechas),
       getReclutamientosDetalle4(fechas),
     ]);
     
@@ -478,9 +467,6 @@ export async function fetchReclutamientosDetallesServer(fechas: FechasParams): P
     if (!detalle2Res.success) {
       throw new Error(detalle2Res.error.message);
     }
-    if (!detalle3Res.success) {
-      throw new Error(detalle3Res.error.message);
-    }
     if (!detalle4Res.success) {
       throw new Error(detalle4Res.error.message);
     }
@@ -488,7 +474,6 @@ export async function fetchReclutamientosDetallesServer(fechas: FechasParams): P
     const reclutamientosData = "data" in reclutamientosRes ? reclutamientosRes.data.detalle : null;
     const reportePorTipo = "data" in detalle1Res ? detalle1Res.data.detalle : null;
     const reportePorEstatus = "data" in detalle2Res ? detalle2Res.data.detalle : null;
-    const reporteDetalle3 = "data" in detalle3Res ? detalle3Res.data.detalle : null;
     const reportePorTipoCredito = "data" in detalle4Res ? detalle4Res.data.detalle : null;
 
     if (!reportePorTipo || !Array.isArray(reportePorTipo.datos)) {
@@ -497,19 +482,15 @@ export async function fetchReclutamientosDetallesServer(fechas: FechasParams): P
     if (!reportePorEstatus || !Array.isArray(reportePorEstatus.datos)) {
       throw new Error("Datos de estatus inválidos");
     }
-    if (!reporteDetalle3 || !Array.isArray(reporteDetalle3.datos)) {
-      throw new Error("Datos de detalle 3 inválidos");
-    }
     if (!reportePorTipoCredito || !Array.isArray(reportePorTipoCredito.datos)) {
       throw new Error("Datos de tipo de crédito inválidos");
     }
 
-    return { reportePorTipo, reportePorEstatus, reporteDetalle3, reportePorTipoCredito, reclutamientosData, error: null };
+    return { reportePorTipo, reportePorEstatus, reportePorTipoCredito, reclutamientosData, error: null };
   } catch (e) {
     return {
       reportePorTipo: null,
       reportePorEstatus: null,
-      reporteDetalle3: null,
       reportePorTipoCredito: null,
       reclutamientosData: null,
       error: e instanceof Error ? e.message : "Error al cargar datos",

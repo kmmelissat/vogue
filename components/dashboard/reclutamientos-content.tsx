@@ -11,6 +11,7 @@ import { ReclutamientosPorEstatusDonut } from "./charts/reclutamientos-por-estat
 import { ReclutamientosPorTipoCreditoBar } from "./charts/reclutamientos-por-tipo-credito-bar";
 import { ReclutamientosKpiCards } from "./kpis/reclutamientos-kpi-cards";
 import { TasaAprobacionGauge } from "./charts/tasa-aprobacion-gauge";
+import { KpiQueryError } from "./kpi-query-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,22 @@ function ReporteCardSkeleton() {
   );
 }
 
+function GaugeSkeleton() {
+  return (
+    <Card className="flex h-full flex-col gap-3 overflow-hidden py-4">
+      <CardHeader className="px-4 pb-2">
+        <Skeleton className="h-4 w-48" />
+      </CardHeader>
+      <CardContent className="flex flex-1 items-center justify-center px-4 pt-0">
+        <Skeleton className="h-[220px] w-[220px] rounded-full" />
+      </CardContent>
+    </Card>
+  );
+}
+
 type ReclutamientosContentProps = {
   initialReportePorTipo: ReportePorZonaDetalle | null;
   initialReportePorEstatus: ReportePorZonaDetalle | null;
-  initialReporteDetalle3: ReportePorZonaDetalle | null;
   initialReportePorTipoCredito: ReportePorZonaDetalle | null;
   initialReclutamientosData: number | null;
   initialFechas: FechasParams;
@@ -43,46 +56,62 @@ type ReclutamientosContentProps = {
 export function ReclutamientosContent({
   initialReportePorTipo,
   initialReportePorEstatus,
-  initialReporteDetalle3,
   initialReportePorTipoCredito,
   initialReclutamientosData,
   initialFechas,
   initialError,
 }: ReclutamientosContentProps) {
-  const { fechas, isInitialFechas, initialDataTimestamp, onDateChange } = 
+  const { fechas, isInitialFechas, initialDataTimestamp, onDateChange } =
     useFechasState({ initialFechas });
-  
-  const { reportePorTipo, reportePorEstatus, reporteDetalle3, reportePorTipoCredito, state, error, retry } =
-    useReclutamientosDetalles(fechas, {
-      initialReportePorTipo: isInitialFechas ? initialReportePorTipo : undefined,
-      initialReportePorEstatus: isInitialFechas ? initialReportePorEstatus : undefined,
-      initialReporteDetalle3: isInitialFechas ? initialReporteDetalle3 : undefined,
-      initialReportePorTipoCredito: isInitialFechas ? initialReportePorTipoCredito : undefined,
-      initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
-    });
 
-  const { kpis: reclutamientosKpis, state: kpisState } = useReclutamientosKpis(fechas, {
+  const {
     reportePorTipo,
     reportePorEstatus,
-    reporteDetalle3,
     reportePorTipoCredito,
-    initialReclutamientosData: isInitialFechas ? initialReclutamientosData : undefined,
+    state,
+    error,
+    retry,
+  } = useReclutamientosDetalles(fechas, {
+    initialReportePorTipo: isInitialFechas ? initialReportePorTipo : undefined,
+    initialReportePorEstatus: isInitialFechas ? initialReportePorEstatus : undefined,
+    initialReportePorTipoCredito: isInitialFechas
+      ? initialReportePorTipoCredito
+      : undefined,
     initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
+  });
+
+  const {
+    kpis: reclutamientosKpis,
+    state: kpisState,
+    error: kpisError,
+    retry: retryKpis,
+  } = useReclutamientosKpis(fechas, {
+    reportePorTipo,
+    reportePorEstatus,
+    reportePorTipoCredito,
+    initialReclutamientosData: isInitialFechas
+      ? initialReclutamientosData
+      : undefined,
+    initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
+    isSsrHydration: isInitialFechas,
   });
 
   const displayError = error ?? initialError;
 
   return (
     <>
-      <DashboardHeader onDateChange={onDateChange} />
-      <div className="flex-1 p-6 space-y-6">
+      <DashboardHeader
+        initialFechas={initialFechas}
+        onDateChange={onDateChange}
+      />
+      <div className="flex-1 space-y-6 p-6">
         {(state === "idle" || state === "loading") && (
           <>
             <div className="space-y-6">
               <Card className="overflow-hidden border-2">
-                <CardContent className="p-6 space-y-4">
+                <CardContent className="space-y-4 p-6">
                   <div className="flex items-start justify-between">
-                    <div className="space-y-3 flex-1">
+                    <div className="flex-1 space-y-3">
                       <Skeleton className="h-6 w-48" />
                       <Skeleton className="h-10 w-64" />
                       <div className="flex gap-4">
@@ -95,14 +124,14 @@ export function ReclutamientosContent({
                   <Skeleton className="h-2 w-full" />
                 </CardContent>
               </Card>
-              
+
               <div className="grid gap-4 md:grid-cols-3">
                 <Skeleton className="h-28 w-full" />
                 <Skeleton className="h-28 w-full" />
                 <Skeleton className="h-28 w-full" />
               </div>
             </div>
-            
+
             <div className="grid items-stretch gap-5 lg:grid-cols-2">
               <ReporteCardSkeleton />
               <ReporteCardSkeleton />
@@ -122,22 +151,31 @@ export function ReclutamientosContent({
         )}
         {state === "success" && (
           <>
+            {kpisState === "error" && kpisError && (
+              <KpiQueryError message={kpisError} onRetry={retryKpis} />
+            )}
             {kpisState === "success" && reclutamientosKpis && (
               <ReclutamientosKpiCards kpis={reclutamientosKpis} />
             )}
-            
+
             <div className="grid items-stretch gap-5 lg:grid-cols-2">
               <ReclutamientosPorTipoPie reportePorTipo={reportePorTipo} />
               <ReclutamientosPorEstatusDonut reportePorEstatus={reportePorEstatus} />
             </div>
 
             <div className="grid items-stretch gap-5 lg:grid-cols-2">
-              <TasaAprobacionGauge 
-                aprobados={reclutamientosKpis?.aprobadosCount ?? 0}
-                denegados={reclutamientosKpis?.denegadosCount ?? 0}
-                procesando={reclutamientosKpis?.procesandoCount ?? 0}
+              {kpisState === "success" && reclutamientosKpis ? (
+                <TasaAprobacionGauge
+                  aprobados={reclutamientosKpis.aprobadosCount}
+                  denegados={reclutamientosKpis.denegadosCount}
+                  procesando={reclutamientosKpis.procesandoCount}
+                />
+              ) : kpisState === "loading" ? (
+                <GaugeSkeleton />
+              ) : null}
+              <ReclutamientosPorTipoCreditoBar
+                reportePorTipoCredito={reportePorTipoCredito}
               />
-              <ReclutamientosPorTipoCreditoBar reportePorTipoCredito={reportePorTipoCredito} />
             </div>
           </>
         )}

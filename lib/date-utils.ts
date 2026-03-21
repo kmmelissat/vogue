@@ -1,3 +1,5 @@
+import type { FechasParams } from "@/api/types";
+
 /**
  * Formatea una fecha para mostrar en UI (ej: "01 feb 2026")
  */
@@ -75,6 +77,14 @@ export function getDateRangeByPeriod(period: "hoy" | "7dias" | "30dias" | "mesAc
     fecha_inicio: formatDateApi(start),
     fecha_fin: formatDateApi(end),
   };
+}
+
+/**
+ * Rango por defecto del dashboard: mismos 30 días inclusivos que el preset "30 días"
+ * del selector (fecha local + formatDateApi, alineado con SSR y cliente).
+ */
+export function getDefaultFechas(): FechasParams {
+  return getDateRangeByPeriod("30dias");
 }
 
 export function getPeriodLabel(period: "hoy" | "7dias" | "30dias" | "mesActual"): string {

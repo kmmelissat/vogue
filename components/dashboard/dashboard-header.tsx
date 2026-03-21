@@ -9,9 +9,14 @@ import type { FechasParams } from "@/api/types";
 
 export type DashboardHeaderProps = {
   onDateChange?: (params: FechasParams) => void;
+  /** Mismas fechas que el SSR; evita disparar onDateChange al montar y alinea el calendario. */
+  initialFechas?: FechasParams;
 };
 
-export function DashboardHeader({ onDateChange }: DashboardHeaderProps) {
+export function DashboardHeader({
+  onDateChange,
+  initialFechas,
+}: DashboardHeaderProps) {
   const {
     period,
     dateRange,
@@ -19,7 +24,7 @@ export function DashboardHeader({ onDateChange }: DashboardHeaderProps) {
     periods,
     applyPeriod,
     onDateRangeChange,
-  } = useDateRange(onDateChange);
+  } = useDateRange(onDateChange, { initialFechas });
 
   return (
     <header className="flex flex-col gap-4 border-b border-border bg-card px-5 py-5 md:flex-row md:items-center md:justify-between">

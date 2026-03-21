@@ -64,7 +64,10 @@ export function DashboardContent({
 
   return (
     <>
-      <DashboardHeader onDateChange={onDateChange} />
+      <DashboardHeader
+        initialFechas={initialFechas}
+        onDateChange={onDateChange}
+      />
       <div className="flex-1 p-6">
         {(state === "idle" || state === "loading") && <DashboardSkeleton />}
         {state === "error" && displayError && (

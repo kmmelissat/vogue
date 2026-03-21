@@ -1,11 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { 
-  getReclutamientosDetalle1, 
-  getReclutamientosDetalle2, 
-  getReclutamientosDetalle3, 
-  getReclutamientosDetalle4 
+import {
+  getReclutamientosDetalle1,
+  getReclutamientosDetalle2,
+  getReclutamientosDetalle4,
 } from "@/api/reporteVisual";
 import type { FechasParams, ReportePorZonaDetalle } from "@/api/types";
 import { queryKeys } from "./query-keys";
@@ -13,14 +12,12 @@ import { queryKeys } from "./query-keys";
 type ReclutamientosDetalles = {
   reportePorTipo: ReportePorZonaDetalle | null;
   reportePorEstatus: ReportePorZonaDetalle | null;
-  reporteDetalle3: ReportePorZonaDetalle | null;
   reportePorTipoCredito: ReportePorZonaDetalle | null;
 };
 
 type UseReclutamientosDetallesOptions = {
   initialReportePorTipo?: ReportePorZonaDetalle | null;
   initialReportePorEstatus?: ReportePorZonaDetalle | null;
-  initialReporteDetalle3?: ReportePorZonaDetalle | null;
   initialReportePorTipoCredito?: ReportePorZonaDetalle | null;
   initialDataUpdatedAt?: number;
 };
@@ -29,10 +26,9 @@ async function fetchReclutamientosDetalles(
   params: FechasParams,
   signal: AbortSignal,
 ): Promise<ReclutamientosDetalles> {
-  const [detalle1Res, detalle2Res, detalle3Res, detalle4Res] = await Promise.all([
+  const [detalle1Res, detalle2Res, detalle4Res] = await Promise.all([
     getReclutamientosDetalle1(params, signal),
     getReclutamientosDetalle2(params, signal),
-    getReclutamientosDetalle3(params, signal),
     getReclutamientosDetalle4(params, signal),
   ]);
 
@@ -42,9 +38,6 @@ async function fetchReclutamientosDetalles(
   if (!detalle2Res.success) {
     throw new Error(detalle2Res.error.message);
   }
-  if (!detalle3Res.success) {
-    throw new Error(detalle3Res.error.message);
-  }
   if (!detalle4Res.success) {
     throw new Error(detalle4Res.error.message);
   }
@@ -53,8 +46,6 @@ async function fetchReclutamientosDetalles(
     "data" in detalle1Res ? detalle1Res.data.detalle : null;
   const reportePorEstatus =
     "data" in detalle2Res ? detalle2Res.data.detalle : null;
-  const reporteDetalle3 =
-    "data" in detalle3Res ? detalle3Res.data.detalle : null;
   const reportePorTipoCredito =
     "data" in detalle4Res ? detalle4Res.data.detalle : null;
 
@@ -64,27 +55,29 @@ async function fetchReclutamientosDetalles(
   if (!reportePorEstatus || !Array.isArray(reportePorEstatus.datos)) {
     throw new Error("Datos de estatus inválidos");
   }
-  if (!reporteDetalle3 || !Array.isArray(reporteDetalle3.datos)) {
-    throw new Error("Datos de detalle 3 inválidos");
-  }
   if (!reportePorTipoCredito || !Array.isArray(reportePorTipoCredito.datos)) {
     throw new Error("Datos de tipo de crédito inválidos");
   }
 
-  return { reportePorTipo, reportePorEstatus, reporteDetalle3, reportePorTipoCredito };
+  return { reportePorTipo, reportePorEstatus, reportePorTipoCredito };
 }
 
 export function useReclutamientosDetalles(
   fechas: FechasParams | null,
   options: UseReclutamientosDetallesOptions = {},
 ) {
-  const { initialReportePorTipo, initialReportePorEstatus, initialReporteDetalle3, initialReportePorTipoCredito } = options;
+  const {
+    initialReportePorTipo,
+    initialReportePorEstatus,
+    initialReportePorTipoCredito,
+  } = options;
   const initialData =
-    initialReportePorTipo || initialReportePorEstatus || initialReporteDetalle3 || initialReportePorTipoCredito
+    initialReportePorTipo ||
+    initialReportePorEstatus ||
+    initialReportePorTipoCredito
       ? {
           reportePorTipo: initialReportePorTipo,
           reportePorEstatus: initialReportePorEstatus,
-          reporteDetalle3: initialReporteDetalle3,
           reportePorTipoCredito: initialReportePorTipoCredito,
         }
       : undefined;
@@ -105,7 +98,6 @@ export function useReclutamientosDetalles(
   return {
     reportePorTipo: query.data?.reportePorTipo ?? null,
     reportePorEstatus: query.data?.reportePorEstatus ?? null,
-    reporteDetalle3: query.data?.reporteDetalle3 ?? null,
     reportePorTipoCredito: query.data?.reportePorTipoCredito ?? null,
     state: query.isFetching || query.isLoading
       ? "loading"

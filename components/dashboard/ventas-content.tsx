@@ -6,6 +6,7 @@ import { useVentasKpis } from "@/hooks/use-ventas-kpis";
 import { useFechasState } from "@/hooks/use-fechas-state";
 import type { ReportePorZonaDetalle, FechasParams } from "@/api/types";
 import { DashboardHeader } from "./dashboard-header";
+import { KpiQueryError } from "./kpi-query-error";
 import { ReportePorZonaCard } from "./charts/reporte-por-zona-card";
 import { ReportePorImpulsadoraCard } from "./charts/reporte-por-impulsadora-card";
 import { ReporteDetalle3Card } from "./charts/reporte-detalle3-card";
@@ -75,7 +76,12 @@ export function VentasContent({
       initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
     });
 
-  const { kpis: ventasKpis, state: kpisState } = useVentasKpis(fechas, {
+  const {
+    kpis: ventasKpis,
+    state: kpisState,
+    error: kpisError,
+    retry: retryKpis,
+  } = useVentasKpis(fechas, {
     reportePorZona,
     reportePorImpulsadora,
     reporteDetalle3,
@@ -88,7 +94,10 @@ export function VentasContent({
 
   return (
     <>
-      <DashboardHeader onDateChange={onDateChange} />
+      <DashboardHeader
+        initialFechas={initialFechas}
+        onDateChange={onDateChange}
+      />
       <div className="flex-1 p-6 space-y-6">
         {(state === "idle" || state === "loading") && (
           <>
@@ -153,6 +162,9 @@ export function VentasContent({
         )}
         {state === "success" && (
           <>
+            {kpisState === "error" && kpisError && (
+              <KpiQueryError message={kpisError} onRetry={retryKpis} />
+            )}
             {kpisState === "success" && ventasKpis && (
               <VentasKpiCards kpis={ventasKpis} />
             )}

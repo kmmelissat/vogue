@@ -6,6 +6,7 @@ import { useActivosKpis } from "@/hooks/use-activos-kpis";
 import { useFechasState } from "@/hooks/use-fechas-state";
 import type { ReportePorZonaDetalle, FechasParams } from "@/api/types";
 import { DashboardHeader } from "./dashboard-header";
+import { KpiQueryError } from "./kpi-query-error";
 import { ReporteActivosPorZonaCard } from "./charts/reporte-activos-por-zona-card";
 import { ReporteActivosTipoCreditoPie } from "./charts/reporte-activos-tipo-credito-pie";
 import { ReporteActivosPorRangoVertical } from "./charts/reporte-activos-por-rango-vertical";
@@ -86,7 +87,12 @@ export function ActivosContent({
     initialDataUpdatedAt: isInitialFechas ? initialDataTimestamp : undefined,
   });
 
-  const { kpis: activosKpis, state: kpisState } = useActivosKpis(fechas, {
+  const {
+    kpis: activosKpis,
+    state: kpisState,
+    error: kpisError,
+    retry: retryKpis,
+  } = useActivosKpis(fechas, {
     reportePorZona,
     reportePorTipoCredito,
     reportePorRango,
@@ -100,7 +106,10 @@ export function ActivosContent({
 
   return (
     <>
-      <DashboardHeader onDateChange={onDateChange} />
+      <DashboardHeader
+        initialFechas={initialFechas}
+        onDateChange={onDateChange}
+      />
       <div className="flex-1 p-6 space-y-6">
         {(state === "idle" || state === "loading") && (
           <>
@@ -164,6 +173,9 @@ export function ActivosContent({
         )}
         {state === "success" && (
           <>
+            {kpisState === "error" && kpisError && (
+              <KpiQueryError message={kpisError} onRetry={retryKpis} />
+            )}
             {kpisState === "success" && activosKpis && (
               <ActivosKpiCards kpis={activosKpis} />
             )}
