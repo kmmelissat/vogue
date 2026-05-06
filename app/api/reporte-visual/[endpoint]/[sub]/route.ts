@@ -41,14 +41,21 @@ export async function POST(
   let fecha_fin: string;
 
   const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("multipart/form-data")) {
-    const formData = await request.formData();
-    fecha_inicio = (formData.get("fecha_inicio") as string) ?? "";
-    fecha_fin = (formData.get("fecha_fin") as string) ?? "";
-  } else {
-    const body = await request.json();
-    fecha_inicio = body.fecha_inicio ?? "";
-    fecha_fin = body.fecha_fin ?? "";
+  try {
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      fecha_inicio = (formData.get("fecha_inicio") as string) ?? "";
+      fecha_fin = (formData.get("fecha_fin") as string) ?? "";
+    } else {
+      const body = await request.json();
+      fecha_inicio = body.fecha_inicio ?? "";
+      fecha_fin = body.fecha_fin ?? "";
+    }
+  } catch {
+    return NextResponse.json(
+      { success: false, detalle: "Error al parsear el body de la petición" },
+      { status: 400 }
+    );
   }
 
   if (!fecha_inicio || !fecha_fin) {
@@ -69,7 +76,6 @@ export async function POST(
   ).toString("base64");
 
   try {
-    const start = performance.now();
     const res = await fetch(url, {
       method: "POST",
       body: formData,
@@ -80,13 +86,8 @@ export async function POST(
       },
     });
     const data = await res.json();
-    const ms = Math.round(performance.now() - start);
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[API Proxy] ${pathSegment}: ${ms}ms`);
-    }
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
-    console.error(`[API Proxy] ${pathSegment}:`, error);
     return NextResponse.json(
       {
         success: false,

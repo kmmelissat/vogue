@@ -6,7 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Formato dinero: $2,000.00 (comas miles, punto decimales, 2 decimales) */
-export function formatMoney(n: number): string {
+export function formatMoney(n: number | undefined | null): string {
+  if (n == null || typeof n !== "number") return "$0.00";
   return (
     "$" +
     n.toLocaleString("en-US", {
@@ -17,14 +18,16 @@ export function formatMoney(n: number): string {
 }
 
 /** Formato número entero: 2,000 (comas miles, sin decimales) */
-export function formatNumber(n: number): string {
+export function formatNumber(n: number | undefined | null): string {
+  if (n == null || typeof n !== "number") return "0";
   return n.toLocaleString("en-US", {
     maximumFractionDigits: 0,
   })
 }
 
 /** Formato porcentaje: 25.5% (1 decimal) */
-export function formatPercent(n: number): string {
+export function formatPercent(n: number | undefined | null): string {
+  if (n == null || typeof n !== "number") return "0.0%";
   return n.toLocaleString("en-US", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
